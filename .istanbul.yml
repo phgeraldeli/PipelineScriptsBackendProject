@@ -1,0 +1,11 @@
+verbose: false
+reporting:
+    print: summary
+    reports:
+        - lcov
+    dir: ./test/reports
+    watermarks:
+        statements: [50, 80]
+        lines: [50, 80]
+        functions: [50, 80]
+        branches: [50, 80]

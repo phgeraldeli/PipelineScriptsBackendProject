@@ -1,0 +1,7 @@
+#Files and Directories ignored.
+
+Jenkinsfile
+jenkins.properties
+devops
+node_modules
+coverage
