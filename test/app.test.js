@@ -14,7 +14,7 @@ chai.use(chaiHttp);
 describe('Test request and response', function () {
 
     it('POST(\"/\") - should return 200', function () {
-        chai.request('http://127.0.0.1:3000')
+        chai.request('http://127.0.0.1:8080')
             .post('/')
             .type('form')
             .send({
