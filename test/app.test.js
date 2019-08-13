@@ -29,7 +29,7 @@ describe('Test request and response', function () {
     });
 
     it('POST(\"/scheduled\") - should return 200', function () {
-        chai.request('http://127.0.0.1:3000')
+        chai.request('http://127.0.0.1:8080')
             .post('/scheduled')
             .type('form')
             .send({
@@ -45,14 +45,14 @@ describe('Test request and response', function () {
 
 
     it('GET - should return 200', function (done) {
-        http.get('http://127.0.0.1:3000', function (res) {
+        http.get('http://127.0.0.1:8080', function (res) {
         assert.equal(200, res.statusCode);
         done();
         });
     });
 
     it('GET - data should be string', function (done) {
-        http.get('http://127.0.0.1:3000', function (res) {
+        http.get('http://127.0.0.1:8080', function (res) {
         var data = '';
             res.on('data', function (chunk) {
                 data += chunk;
