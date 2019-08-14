@@ -107,7 +107,7 @@ objects:
         - image: " "
           name: "${NAME}"
           ports:
-            - containerPort: "${PORT}"
+            - containerPort: 3000
               protocol: TCP
 parameters:
 - name: NAME
@@ -120,5 +120,5 @@ parameters:
   value: nodejs-example
 - name: PORT
   displayName: Container Port
-  required: true
+  required: false
   value: 3000
