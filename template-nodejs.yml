@@ -118,7 +118,3 @@ parameters:
   displayName: App label
   required: true
   value: nodejs-example
-- name: PORT
-  displayName: Container Port
-  required: false
-  value: 3000
