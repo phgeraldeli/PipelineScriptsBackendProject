@@ -1,6 +1,6 @@
 {
   "name": "Elastic-Beanstalk-Sample-App",
-  "version": "1.2.209",
+  "version": "1.2.300",
   "private": true,
   "dependencies": {},
   "scripts": {
