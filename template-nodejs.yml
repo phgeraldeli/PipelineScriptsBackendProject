@@ -121,3 +121,4 @@ parameters:
 - name: PORT
   displayName: Container Port
   required: true
+  value: 8080
