@@ -58,7 +58,7 @@ objects:
     - name: web
       port: 8080
       protocol: TCP
-      targetPort: "${PORT}"
+      targetPort: 3000
     selector:
       app: "${NAME}"
       deploymentconfig: "${NAME}"
@@ -121,4 +121,4 @@ parameters:
 - name: PORT
   displayName: Container Port
   required: true
-  value: 8080
+  value: 3000
