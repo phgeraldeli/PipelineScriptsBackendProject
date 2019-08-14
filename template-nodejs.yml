@@ -4,6 +4,7 @@ labels:
   template: nodejs-dev-build
 metadata:
   name: nodejs-dev-build
+  namespace: "${PROJETO}"
 objects:
 - apiVersion: v1
   kind: ImageStream
@@ -114,7 +115,10 @@ parameters:
   displayName: Name
   description: The name assigned to all of the frontend objects defined in this template.
   required: true
-  value: nodejs-example
+- name: PROJETO
+  displayName: Projeto
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
 - name: LABEL
   displayName: App label
   required: true
