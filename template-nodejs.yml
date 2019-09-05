@@ -23,7 +23,7 @@ objects:
     source:
       type: Git
       git:
-        uri: 'https://github.com/cmotta2016/nodejs-ex'
+        uri: 'https://github.com/cmotta2016/PipelineScriptsBackendProject.git'
     strategy:
       type: Source
       sourceStrategy:
