@@ -23,7 +23,7 @@ objects:
     source:
       type: Git
       git:
-        uri: 'https://github.com/cmotta2016/nodejs-ex.git'
+        uri: 'https://github.com/cmotta2016/PipelineScriptsBackendProject.git'
     strategy:
       type: Source
       sourceStrategy:
@@ -45,7 +45,7 @@ objects:
       generic:
         secret: secret101
     postCommit:
-      script: npm test -- --coverage
+      script: npm test
     runPolicy: Serial
 - apiVersion: v1
   kind: Service
