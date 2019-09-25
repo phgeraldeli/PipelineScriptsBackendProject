@@ -10,7 +10,7 @@ spec:
   component: web
  ports:
   - port: 8080
-    targetPort: 8080
+    targetPort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -33,4 +33,4 @@ spec:
     - name: nodejs
       image: cmotta2016/k8s-nodejs
       ports:
-       - containerPort: 8080
+       - containerPort: 3000
