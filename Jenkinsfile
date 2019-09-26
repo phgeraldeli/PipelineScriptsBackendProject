@@ -14,7 +14,7 @@ timestamps {
             def sonar = load 'sonar.groovy'
             sonar.codeQuality()
         }
-        stage('Build'){
+        stage('Build S2I'){
             sh 's2i build . openshift/nodejs-010-centos7 cmotta2016/k8s-nodejs --loglevel 1 --network host'
         }
         stage('Push Image'){
