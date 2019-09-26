@@ -27,6 +27,7 @@ timestamps {
             }
         }
         stage('Deploy'){
+            sh 'kubectl create namespace -n nodejs-test'
             sh 'kubectl apply -f k8s-nodejs.yml -n nodejs-test'
         }
     }
