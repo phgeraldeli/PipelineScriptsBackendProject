@@ -71,6 +71,9 @@ objects:
   spec:
     port:
       targetPort: web
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
     to:
       kind: Service
       name: "${NAME}"
