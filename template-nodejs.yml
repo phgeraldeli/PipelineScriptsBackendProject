@@ -23,6 +23,7 @@ objects:
     source:
       type: Git
       git:
+        ref: openshift
         uri: 'https://github.com/cmotta2016/PipelineScriptsBackendProject.git'
     strategy:
       type: Source
