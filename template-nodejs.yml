@@ -45,8 +45,7 @@ objects:
     - type: Generic
       generic:
         secret: secret101
-    postCommit:
-      script: npm test
+    postCommit: {}
     runPolicy: Serial
 - apiVersion: v1
   kind: Service
