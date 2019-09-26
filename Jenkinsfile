@@ -1,33 +1,41 @@
-timestamps {
-    node('nodejsoci') {
+timestamps{
+    def label="dev-backend"
+    node('nodejs'){
         stage('Checkout'){
+            //checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/cmotta2016/PipelineScriptsBackendProject.git']]])
             checkout scm
-            //checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/cmotta2016/nodejs-ex.git']]])
         }
         stage('Compile'){
             sh 'npm install'
         }
-        stage ('Test'){
+        stage('Test'){
             sh 'npm test'
         }
         stage ('Code Quality'){
             def sonar = load 'sonar.groovy'
             sonar.codeQuality()
         }
-        stage('Build'){
-            sh 's2i build . openshift/nodejs-010-centos7 cmotta2016/k8s-nodejs --loglevel 1 --network host'
-        }
-        stage('Push Image'){
-            withCredentials([usernamePassword(credentialsId: 'docker-io', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-            sh '''
-            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-            docker push cmotta2016/k8s-nodejs
-            docker rmi -f cmotta2016/k8s-nodejs
-            '''
+        openshift.withCluster() {
+            openshift.withProject('node-backend') {
+                stage('cleanup') {
+                    sh "oc delete all -l app=${label} -n node-backend"
+                }
+                stage('Create Template') {
+                    def PROJETO = 'node-backend'
+                    sh "oc new-app --file=template-nodejs.yml --param=LABEL=dev-backend --param=NAME=dev-backend --namespace=node-backend"
+                    sh 'oc logs -f bc/dev-backend --namespace=node-backend'
+                }
+                stage('Build') {
+                    sh 'oc delete buildconfig -l app=dev-backend -n node-backend'
+                    def build = openshift.newBuild(".", "--strategy=source", "--name=dev-backend", "--labels app=dev-backend")
+                    build.logs('-f')
+                }
+                stage('Deploy') {
+                    openshift.selector("dc", "dev-backend").rollout()
+                    def dc = openshift.selector("dc", "dev-backend")
+                    dc.rollout().status()
+                }
             }
-        }
-        stage('Deploy'){
-            sh 'kubectl apply -f k8s-nodejs.yml'
         }
     }
 }
