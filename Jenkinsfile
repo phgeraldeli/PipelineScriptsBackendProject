@@ -17,7 +17,7 @@ timestamps{
         }
         openshift.withCluster() {
             openshift.withProject('node-backend-qa') {
-                stage('cleanup') {
+                stage('Cleanup') {
                     sh "oc delete all -l app=${label} -n node-backend-qa"
                 }
                 stage('Create Template') {
