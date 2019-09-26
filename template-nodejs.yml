@@ -23,13 +23,13 @@ objects:
     source:
       type: Git
       git:
-        uri: 'https://github.com/cmotta2016/nodejs-ex.git'
+        uri: 'https://github.com/cmotta2016/PipelineScriptsBackendProject.git'
     strategy:
       type: Source
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: 'nodejs:10'
+          name: 'nodejs:8'
           namespace: openshift
     output:
       to:
