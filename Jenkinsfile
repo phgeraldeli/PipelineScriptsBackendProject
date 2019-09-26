@@ -21,7 +21,6 @@ timestamps{
                     sh "oc delete all -l app=${label} -n node-backend-qa"
                 }
                 stage('Create Template') {
-                    //def PROJETO = 'node-backend-qa'
                     sh "oc new-app --file=template-nodejs.yml --param=LABEL=dev-backend --param=NAME=dev-backend --namespace=node-backend-qa"
                     sh 'oc logs -f bc/dev-backend --namespace=node-backend-qa'
                 }
