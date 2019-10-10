@@ -21,7 +21,7 @@ timestamps{
                         echo "Criando build"
                         //openshift.newBuild("--name=${NAME}", "--image-stream=openshift/nodejs:10", "--binary", "-l app=${LABEL}")
                         //def build = openshift.selector("bc", "${NAME}").startBuild("--from-repo=.", "--wait")
-                        def nb = openshift.newBuild("https://github.com/cmotta2016/PipelineScriptsBackendProject.git#openshift", "--strategy=source", "--image-stream=${IMAGESTREAM}", "--name=${NAME}", "-l app=${LABEL}")
+                        def nb = openshift.newBuild("https://github.com/cmotta2016/PipelineScriptsBackendProject.git#openshift", "--strategy=source", "--image-stream=${BUILDERIMAGE}", "--name=${NAME}", "-l app=${LABEL}")
                         def buildSelector = nb.narrow("bc").related("builds")
                         buildSelector.logs('-f')
                         /*timeout(5) { // Throw exception after 5 minutes
