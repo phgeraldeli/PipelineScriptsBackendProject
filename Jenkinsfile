@@ -41,7 +41,7 @@ timestamps{
                     }//stage
                 stage('Deploy QA') {
                     echo "Criando Deployment"
-                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}"), "--param-file=jenkins.properties"))
+                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}"), "--param-file=template_environments"))
                     openshift.selector("dc", "${NAME}").rollout().latest()
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
