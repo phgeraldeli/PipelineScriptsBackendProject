@@ -19,26 +19,25 @@ timestamps{
                 stage('Build'){
                     if (!openshift.selector("bc", "${NAME}").exists()) {
                         echo "Criando build"
-                        //openshift.newBuild("--name=${NAME}", "--image-stream=openshift/nodejs:10", "--binary", "-l app=${LABEL}")
-                        //def build = openshift.selector("bc", "${NAME}").startBuild("--from-repo=.", "--wait")
-                        def nb = openshift.newBuild("https://github.com/cmotta2016/PipelineScriptsBackendProject.git#openshift", "--strategy=source", "--image-stream=${IMAGE_BUILDER}", "--name=${NAME}", "-l app=${LABEL}")
+                        def nb = openshift.newBuild(".", "--strategy=source", "--image-stream=${IMAGE_BUILDER}", "--name=${NAME}", "-l app=${LABEL}")
                         def buildSelector = nb.narrow("bc").related("builds")
                         buildSelector.logs('-f')
-                        /*timeout(5) { // Throw exception after 5 minutes
-                            buildSelector.untilEach(1) {
-                                return (it.object().status.phase == "Complete")
-                            }
-                        }
-                        echo "Builds have been created: ${buildSelector.names()}"
-                        //nb.logs()*/
                     }//if
                     else {
-                        //def build = openshift.selector("bc", "${NAME}").startBuild("--from-repo=.", "--wait")
                         echo "Build já existe. Iniciando build"
                         def build = openshift.selector("bc", "${NAME}").startBuild()
                         build.logs('-f')
                     }//else
                     }//stage
+                stage('Deploy QA') {
+                    echo "Criando Deployment"
+                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}"), "--param-file=template_environments"))
+                    openshift.selector("dc", "${NAME}").rollout().latest()
+                    def dc = openshift.selector("dc", "${NAME}")
+                    dc.rollout().status()
+                }//stage
+            }//withProject
+            openshift.withProject("${PROJECT}-hml") {
                 stage('Deploy QA') {
                     echo "Criando Deployment"
                     openshift.apply(openshift.process(readFile(file:"${TEMPLATE}"), "--param-file=template_environments"))
