@@ -67,14 +67,13 @@ spec:
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  labels:
-    app: nodejs
   name: nodejs
+  namespace: nodejs
 spec:
-  maxReplicas: 3
-  minReplicas: 1
   scaleTargetRef:
-    apiVersion: v1
+    apiVersion: apps/v1
     kind: Deployment
     name: nodejs
-  targetCPUUtilizationPercentage: 80
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
