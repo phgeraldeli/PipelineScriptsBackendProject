@@ -63,7 +63,7 @@ spec:
         successThreshold: 1
         failureThreshold: 3
 ---
-apiVersion: autoscaling/v1
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: nodejs
@@ -75,4 +75,10 @@ spec:
     name: nodejs
   minReplicas: 1
   maxReplicas: 10
-  targetCPUUtilizationPercentage: 50
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
