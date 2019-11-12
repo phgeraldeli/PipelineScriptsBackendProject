@@ -24,6 +24,7 @@ spec:
  replicas: 1
  selector:
   matchLabels:
+   app: nodejs
    component: web
  template:
   metadata:
