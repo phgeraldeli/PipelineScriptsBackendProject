@@ -33,7 +33,7 @@ spec:
   spec:
    containers: 
     - name: nodejs
-      image: nexus-docker.nexus:30503/k8s-nodejs
+      image: 35.223.93.45:30503/k8s-nodejs
       resources:
         limits:
           cpu: '1'
