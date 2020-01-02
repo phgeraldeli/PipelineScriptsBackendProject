@@ -33,7 +33,7 @@ spec:
   spec:
    containers: 
     - name: nodejs
-      image: 35.223.93.45:30503/k8s-nodejs
+      image: 34.67.205.243:30503/k8s-nodejs
       resources:
         limits:
           cpu: '1'
