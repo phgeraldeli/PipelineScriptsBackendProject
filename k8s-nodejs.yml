@@ -1,7 +1,16 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: nodejs
+spec:
+  finalizers:
+    - kubernetes
+---
 apiVersion: v1
 kind: Service
 metadata:
  name: nodejs-service
+ namespace: nodejs
  labels:
    app: nodejs
 spec:
@@ -19,6 +28,7 @@ metadata:
  labels:
    app: nodejs
  name: nodejs
+ namespace: nodejs
  annotations:  
    template.alpha.openshift.io/wait-for-ready: 'true'
 spec:
