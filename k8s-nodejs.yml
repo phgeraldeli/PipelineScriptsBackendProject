@@ -33,7 +33,7 @@ spec:
   spec:
    containers: 
     - name: nodejs
-      image: 34.67.205.243:30503/k8s-nodejs
+      image: registry.apps.linux4sysadmin.com.br/nodejs/nodejs:1.0
       resources:
         limits:
           cpu: '1'
