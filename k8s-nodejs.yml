@@ -74,13 +74,13 @@ spec:
    containers: 
     - name: nodejs
       image: container.gke.linux4sysadmin.com.br/k8s-nodejs
-#      resources:
+      resources:
 #        limits:
 #          cpu: '1'
 #          memory: 1Gi
-#        requests:
-#          cpu: 100m
-#          memory: 1024Mi
+        requests:
+          cpu: 100m
+          memory: 150Mi
       ports:
        - containerPort: 3000
       livenessProbe:
@@ -124,3 +124,15 @@ spec:
 #      target:    # For use with v2beta2 version
 #        type: Utilization
 #        averageUtilization: 50
+---
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: nodejs-vpa
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind:       Deployment
+    name:       nodejs
+  updatePolicy:
+    updateMode: "Auto"
