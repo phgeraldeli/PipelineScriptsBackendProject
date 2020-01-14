@@ -6,27 +6,6 @@ spec:
  finalizers:
   - kubernetes
 ---
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
- annotations:
-   kubernetes.io/ingress.class: nginx
- name: jenkins
- namespace: nodejs
-spec:
- rules:
-   - host: nodejs.gke.linux4sysadmin.com.br
-      http:
-        paths:
-          - backend:
-              serviceName: nodejs
-              servicePort: 8080
-            path: /
-  tls:
-    - hosts:
-        - nodejs.gke.linux4sysadmin.com.br
-      #secretName: apps-tls
----
 apiVersion: v1
 kind: Service
 metadata:
