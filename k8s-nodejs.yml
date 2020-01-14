@@ -7,6 +7,15 @@ spec:
   - kubernetes
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: regcred
+  namespace: nodejs
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJjb250YWluZXIuZ2tlLmxpbnV4NHN5c2FkbWluLmNvbS5iciI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJsZW5vdm8wMSIsImF1dGgiOiJZV1J0YVc0NmJHVnViM1p2TURFPSJ9fX0=
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: v1
 kind: Service
 metadata:
  name: nodejs-service
@@ -41,6 +50,8 @@ spec:
    labels:
     app: nodejs
   spec:
+   imagePullSecrets:
+    - name: regcred
    containers: 
     - name: nodejs
       image: container.gke.linux4sysadmin.com.br/k8s-nodejs
@@ -74,7 +85,7 @@ spec:
         successThreshold: 1
         failureThreshold: 3
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: nodejs
@@ -90,6 +101,7 @@ spec:
   - type: Resource
     resource:
       name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 50
+      targetAverageUtilization: 50
+#      target:    # For use with v2beta2 version
+#        type: Utilization
+#        averageUtilization: 50
