@@ -74,13 +74,13 @@ spec:
    containers: 
     - name: nodejs
       image: container.gke.linux4sysadmin.com.br/k8s-nodejs
-      resources:
-        limits:
-          cpu: '1'
-          memory: 1Gi
-        requests:
-          cpu: 100m
-          memory: 1024Mi
+#      resources:
+#        limits:
+#          cpu: '1'
+#          memory: 1Gi
+#        requests:
+#          cpu: 100m
+#          memory: 1024Mi
       ports:
        - containerPort: 3000
       livenessProbe:
