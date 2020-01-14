@@ -12,6 +12,7 @@ metadata:
  annotations:
    kubernetes.io/ingress.class: nginx
  name: jenkins
+ namespace: nodejs
 spec:
  rules:
    - host: nodejs.gke.linux4sysadmin.com.br
