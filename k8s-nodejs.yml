@@ -120,19 +120,19 @@ spec:
   - type: Resource
     resource:
       name: cpu
-      targetAverageUtilization: 50
+      targetAverageUtilization: 90
 #      target:    # For use with v2beta2 version
 #        type: Utilization
 #        averageUtilization: 50
----
-apiVersion: autoscaling.k8s.io/v1
-kind: VerticalPodAutoscaler
-metadata:
-  name: nodejs-vpa
-spec:
-  targetRef:
-    apiVersion: "apps/v1"
-    kind:       Deployment
-    name:       nodejs
-  updatePolicy:
-    updateMode: "Auto"
+#---
+#apiVersion: autoscaling.k8s.io/v1
+#kind: VerticalPodAutoscaler
+#metadata:
+#  name: nodejs-vpa
+#spec:
+#  targetRef:
+#    apiVersion: "apps/v1"
+#    kind:       Deployment
+#    name:       nodejs
+#  updatePolicy:
+#    updateMode: "Auto"
