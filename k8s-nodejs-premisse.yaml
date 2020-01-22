@@ -13,7 +13,7 @@ metadata:
   name: regcred
   namespace: nodejs
 data:
-  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS5hcHBzLmxpbnV4NHN5c2FkbWluLmNvbS5iciI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJsZW5vdm8wMSIsImF1dGgiOiJZV1J0YVc0NmJHVnViM1p2TURFPSJ9fX0=
+  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS5hcHBzLmxpbnV4NHN5c2FkbWluLmNvbS5iciI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiIsImF1dGgiOiJZV1J0YVc0NllXUnRhVzQ9In19fQ==
 type: kubernetes.io/dockerconfigjson
 ---
 apiVersion: v1
