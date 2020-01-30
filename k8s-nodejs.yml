@@ -73,11 +73,11 @@ spec:
     - name: regcred
    containers: 
     - name: nodejs
-      image: container.gke.linux4sysadmin.com.br/k8s-nodejs
+      image: container.gke.linux4sysadmin.com.br/node/k8s-nodejs
       resources:
-#        limits:
-#          cpu: '1'
-#          memory: 1Gi
+        limits:
+          cpu: '1'
+          memory: 1Gi
         requests:
           cpu: 100m
           memory: 50Mi
@@ -104,7 +104,7 @@ spec:
         successThreshold: 1
         failureThreshold: 3
 ---
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: nodejs
@@ -120,10 +120,10 @@ spec:
   - type: Resource
     resource:
       name: cpu
-      targetAverageUtilization: 90
-#      target:    # For use with v2beta2 version
-#        type: Utilization
-#        averageUtilization: 50
+      #targetAverageUtilization: 90
+      target:    # For use with v2beta2 version
+        type: Utilization
+        averageUtilization: 50
 #---
 #apiVersion: autoscaling.k8s.io/v1
 #kind: VerticalPodAutoscaler
