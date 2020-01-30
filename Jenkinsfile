@@ -27,7 +27,7 @@ timestamps {
             }
         }
         stage('Deploy'){
-            sh 'kubectl apply -f k8s-nodejs.yml'
+            sh 'kubectl apply -f k8s-nodejs.yml --validate=false'
         }
     }
 }
