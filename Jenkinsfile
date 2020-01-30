@@ -15,19 +15,19 @@ timestamps {
             sonar.codeQuality()
         }
         stage('Build S2I'){
-            sh 's2i build . openshift/nodejs-010-centos7 cmotta2016/k8s-nodejs --loglevel 1 --network host'
+            sh 's2i build . hub.gke.linux4sysadmin.com.br/openshift/nodejs-010-centos7 container.gke.linux4sysadmin.com.br/node/k8s-nodejs --loglevel 1 --network host'
         }
         stage('Push Image'){
             withCredentials([usernamePassword(credentialsId: 'docker-io', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
             sh '''
-            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-            docker push cmotta2016/k8s-nodejs
-            docker rmi -f cmotta2016/k8s-nodejs
+            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" container.gke.linux4sysadmin.com.br
+            docker push container.gke.linux4sysadmin.com.br/node/k8s-nodejs
+            docker rmi -f container.gke.linux4sysadmin.com.br/node/k8s-nodejs
             '''
             }
         }
         stage('Deploy'){
-            sh 'kubectl apply -f k8s-nodejs.yml -n nodejs'
+            sh 'kubectl apply -f k8s-nodejs.yml'
         }
     }
 }
