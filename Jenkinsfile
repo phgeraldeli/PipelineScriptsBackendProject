@@ -5,7 +5,7 @@ timestamps{
             checkout scm
         }
         stage('Compile'){
-            sh 'npm set registry http://cicdtools.oracle.msdigital.pro:8081/repository/npm-group
+            sh 'npm set registry http://cicdtools.oracle.msdigital.pro:8081/repository/npm-group'
             sh 'npm install'
         }
         stage('Test'){
