@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: marketing-management-v1
+  template: marketing-management-v2
 metadata:
-  name: marketing-management-v1
+  name: marketing-management-v2
 objects:
 - apiVersion: v1
   kind: Service
