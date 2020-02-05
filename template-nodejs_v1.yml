@@ -70,13 +70,13 @@ objects:
         containers:
         - image: " "
           name: "${NAME}"
-          #resources:
-          #  limits:
-          #    cpu: '1'
-          #    memory: 1Gi
-          #  requests:
-          #    cpu: 100m
-          #    memory: 1024Mi
+          resources:
+            limits:
+              cpu: '1'
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 1024Mi
           ports:
             - containerPort: 3000
               protocol: TCP
