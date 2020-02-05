@@ -37,13 +37,13 @@ timestamps{
                     dc.rollout().status()
                 }//stage
             }//withProject
-            openshift.withProject("${PROJECT}-hml") {
+            /*openshift.withProject("${PROJECT}-hml") {
                 stage('Deploy QA') {
                     echo "Criando Deployment"
                     openshift.apply(openshift.process(readFile(file:"${TEMPLATE}"), "--param-file=template_environments"))
                     openshift.selector("dc", "${NAME}").rollout().latest()
                     def dc = openshift.selector("dc", "${NAME}")
-                    dc.rollout().status()
+                    dc.rollout().status()/*
                 }//stage
             }//withProject
         }//withCluster
