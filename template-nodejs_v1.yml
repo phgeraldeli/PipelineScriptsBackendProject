@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: nodejs-dev-build
+  template: marketing-management-v1
 metadata:
-  name: nodejs-dev-build
+  name: marketing-management-v1
 objects:
 - apiVersion: v1
   kind: Service
@@ -122,4 +122,4 @@ parameters:
 - name: LABEL
   displayName: App label
   required: true
-  value: nodejs-example
+  value: marketing-management-v1
