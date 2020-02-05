@@ -43,9 +43,9 @@ timestamps{
                     openshift.apply(openshift.process(readFile(file:"${TEMPLATE}"), "--param-file=template_environments"))
                     openshift.selector("dc", "${NAME}").rollout().latest()
                     def dc = openshift.selector("dc", "${NAME}")
-                    dc.rollout().status()*/
+                    dc.rollout().status()
                 }//stage
-            }//withProject
+            }//withProject*/
         }//withCluster
     }//node
 }//timestamps
