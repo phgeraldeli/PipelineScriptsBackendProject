@@ -72,10 +72,10 @@ objects:
           name: "${NAME}"
           resources:
             limits:
-              cpu: '1'
+              cpu: '2'
               memory: 1Gi
             requests:
-              cpu: 100m
+              cpu: 200m
               memory: 1024Mi
           ports:
             - containerPort: 3000
