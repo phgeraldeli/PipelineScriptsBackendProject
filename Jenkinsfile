@@ -5,6 +5,7 @@ timestamps {
             //checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/cmotta2016/nodejs-ex.git']]])
         }
         stage('Compile'){
+            sh 'npm config set registry http://129.213.187.72/repository/npm-group/'
             sh 'npm install'
         }
         stage ('Test'){
