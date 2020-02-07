@@ -5,16 +5,16 @@ timestamps{
             checkout scm
         }
         stage('Compile'){
-            sh 'npm set registry http://cicdtools.oracle.msdigital.pro:8081/repository/npm-group'
+            //sh 'npm set registry http://cicdtools.oracle.msdigital.pro:8081/repository/npm-group'
             sh 'npm install'
         }
         stage('Test'){
             sh 'npm test'
         }
-        stage ('Code Quality'){
+        /*stage ('Code Quality'){
             def sonar = load 'sonar.groovy'
             sonar.codeQuality()
-        }
+        }*/
         openshift.withCluster() {
             openshift.withProject("${PROJECT}-qa") {
                 stage('Build'){
@@ -32,21 +32,21 @@ timestamps{
                     }//stage
                 stage('Deploy QA') {
                     echo "Criando Deployment"
-                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}"), "--param-file=template_environments"))
+                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-qa"), "--param-file=template_environments"))
                     openshift.selector("dc", "${NAME}").rollout().latest()
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
                 }//stage
             }//withProject
-            /*openshift.withProject("${PROJECT}-hml") {
+            openshift.withProject("${PROJECT}-hml") {
                 stage('Deploy QA') {
                     echo "Criando Deployment"
-                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}"), "--param-file=template_environments"))
+                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-hml"), "--param-file=template_environments"))
                     openshift.selector("dc", "${NAME}").rollout().latest()
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
                 }//stage
-            }//withProject*/
+            }//withProject
         }//withCluster
     }//node
 }//timestamps
