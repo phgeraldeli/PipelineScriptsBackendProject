@@ -39,7 +39,7 @@ timestamps{
                 }//stage
             }//withProject
             openshift.withProject("${PROJECT}-hml") {
-                stage('Deploy QA') {
+                stage('Deploy HML') {
                     echo "Criando Deployment"
                     openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-hml.yml"), "--param-file=template_environments"))
                     openshift.selector("dc", "${NAME}").rollout().latest()
