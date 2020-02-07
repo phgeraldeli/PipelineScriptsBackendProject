@@ -24,13 +24,13 @@ metadata:
  labels:
    app: nodejs
 spec:
- type: NodePort
+ type: LoadBalancer
  selector:
    app: nodejs
  ports:
   - port: 8080
     targetPort: 3000
-    nodePort: 30523
+    #nodePort: 30523
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -55,7 +55,7 @@ spec:
     - name: regcred
    containers: 
     - name: nodejs
-      image: registry.apps.linux4sysadmin.com.br/nodejs/k8s-nodejs
+      image: 129.213.187.72:5003/nodejs/k8s-nodejs
       resources:
         limits:
           cpu: '1'
