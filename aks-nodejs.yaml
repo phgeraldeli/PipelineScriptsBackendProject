@@ -75,7 +75,7 @@ spec:
     - name: acrregcred
    containers: 
     - name: nodejs
-      image: cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER}
+      image: cmotta2016.azurecr.io/k8s-nodejs:latest
       resources:
         limits:
           cpu: '1'
