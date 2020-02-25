@@ -20,7 +20,7 @@ timestamps{
                 stage('Build'){
                     if (!openshift.selector("bc", "${NAME}").exists()) {
                         echo "Criando build"
-                        def nb = openshift.newBuild(".", "--strategy=source", "--image-stream=${IMAGE_BUILDER}", "--name=${NAME}", "-l app=${LABEL}")
+                        def nb = openshift.newBuild(".", "--strategy=source", "--image-stream=cmotta2016/nodejs-8-bases2i:latest", "--name=${NAME}", "-l app=${LABEL}")
                         def buildSelector = nb.narrow("bc").related("builds")
                         buildSelector.logs('-f')
                     }//if
