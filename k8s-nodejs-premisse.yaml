@@ -55,7 +55,7 @@ spec:
     - name: regcred
    containers: 
     - name: nodejs
-      image: 129.213.187.72:5003/node/k8s-nodejs
+      image: 129.213.187.72:5003/node/k8s-nodejs:latest
       resources:
         limits:
           cpu: '1'
