@@ -1,0 +1,22 @@
+timestamps {
+    node('nodejs') {
+        stage('Deploy on AKS'){
+            def activeService = sh(script: "kubectl get ingress nodejs -n nodejs -o jsonpath='{ .spec.rules[0].http.paths[0].backend.serviceName }'", returnStdout: false).trim()
+            echo activeService
+            if (activeService == "blue-nodejs-service") {
+                echo "Entrou no if"
+                sh 'kubectl apply -f aks-nodejs-green.yaml --validate=false'
+                sh 'kubectl set image deployment/green-nodejs nodejs=cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} --record -n nodejs'
+                sh 'kubectl rollout status deployment.apps/green-nodejs -n nodejs'
+                sh """kubectl patch ingress nodejs -n nodejs --type='json' -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"green-nodejs-service"}]'"""
+            }
+            else {
+                echo "Entrou no Else"
+                sh 'kubectl apply -f aks-nodejs-blue.yaml --validate=false'
+                sh 'kubectl set image deployment/blue-nodejs nodejs=cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} --record -n nodejs'
+                sh 'kubectl rollout status deployment.apps/blue-nodejs -n nodejs'
+                sh """kubectl patch ingress nodejs -n nodejs --type='json' -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"blue-nodejs-service"}]'"""
+            }
+        }//stage
+    }
+}

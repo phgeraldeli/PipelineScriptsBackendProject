@@ -12,20 +12,20 @@ metadata:
   annotations:
     #kubernetes.io/ingress.class: addon-http-application-routing
     kubernetes.io/ingress.class: nginx
-  name: nodejs
+  name: blue-nodejs
   namespace: nodejs
 spec:
   rules:
-    - host: nodejs.aks.linux4sysadmin.com.br
+    - host: blue-nodejs.aks.linux4sysadmin.com.br
       http:
         paths:
           - backend:
-              serviceName: nodejs-service
+              serviceName: blue-nodejs-service
               servicePort: 8080
             path: /
   tls:
     - hosts:
-        - nodejs.aks.linux4sysadmin.com.br
+        - blue-nodejs.aks.linux4sysadmin.com.br
 ---
 apiVersion: v1
 data:
@@ -37,16 +37,19 @@ metadata:
   namespace: nodejs
 type: kubernetes.io/dockerconfigjson
 ---
+# Blue Environment
 apiVersion: v1
 kind: Service
 metadata:
- name: nodejs-service
+ name: blue-nodejs-service
  namespace: nodejs
  labels:
    app: nodejs
+   role: blue
 spec:
  selector:
    app: nodejs
+   role: blue
  ports:
   - port: 8080
     targetPort: 3000
@@ -56,7 +59,8 @@ kind: Deployment
 metadata:
  labels:
    app: nodejs
- name: nodejs
+   role: blue
+ name: blue-nodejs
  namespace: nodejs
  annotations:  
    template.alpha.openshift.io/wait-for-ready: 'true'
@@ -65,17 +69,19 @@ spec:
  selector:
   matchLabels:
    app: nodejs
+   role: blue
  template:
   metadata:
    labels:
     app: nodejs
+    role: blue
   spec:
    imagePullSecrets:
     - name: acrregcred
    containers: 
     - name: nodejs
       image: cmotta2016.azurecr.io/k8s-nodejs
-      imagePullPolicy: IfNotPresent
+      #imagePullPolicy: Always
       resources:
         limits:
           cpu: '1'
@@ -109,15 +115,15 @@ spec:
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: nodejs
+  name: blue-nodejs
   namespace: nodejs
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: nodejs
-  minReplicas: 2
-  maxReplicas: 5
+    name: blue-nodejs
+  minReplicas: 1
+  maxReplicas: 2
   metrics:
   - type: Resource
     resource:
@@ -125,16 +131,4 @@ spec:
       #targetAverageUtilization: 90
       target:    # For use with v2beta2 version
         type: Utilization
-        averageUtilization: 70
-#---
-#apiVersion: autoscaling.k8s.io/v1
-#kind: VerticalPodAutoscaler
-#metadata:
-#  name: nodejs-vpa
-#spec:
-#  targetRef:
-#    apiVersion: "apps/v1"
-#    kind:       Deployment
-#    name:       nodejs
-#  updatePolicy:
-#    updateMode: "Auto"
+        averageUtilization: 50
