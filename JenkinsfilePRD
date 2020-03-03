@@ -1,21 +1,79 @@
 timestamps {
     node('nodejs') {
+        stage('Checkout'){
+            checkout scm
+            //checkout([$class: 'GitSCM', branches: [[name: '*/aks']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/cmotta2016/PipelineScriptsBackendProject.git']]])
+        }
+        stage('Compile with Azure Artifacts'){
+            sh '''
+            npm config set registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/
+            npm config set always-auth=true
+            cp /opt/npm/.npmrc /home/jenkins/
+            npm install
+            '''
+        }
+        stage ('Test'){
+            sh 'npm test'
+        }
+        /*stage ('Code Quality'){
+            def sonar = load 'sonar.groovy'
+            sonar.codeQuality()
+        }
+        stage('Quality Gate'){
+            sleep(30)
+            timeout(activity: true, time: 30, unit: 'SECONDS') {
+                def qg = waitForQualityGate()
+                if (qg.status.toUpperCase() == 'ERROR') {
+                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                }//if
+            }//timeout
+        }*/
+        stage('Build with S2I'){
+            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} --loglevel 1 --network host'
+        }
+        stage('Push Image to ACR'){
+            withCredentials([usernamePassword(credentialsId: 'acr-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+            sh '''
+            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" cmotta2016.azurecr.io
+            docker tag cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} cmotta2016.azurecr.io/k8s-nodejs:latest
+            docker push cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER}
+            docker push cmotta2016.azurecr.io/k8s-nodejs:latest
+            docker rmi -f cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} cmotta2016.azurecr.io/k8s-nodejs:latest
+            '''
+            }
+        }
         stage('Deploy on AKS'){
-            def activeService = sh(script: "kubectl get ingress nodejs -n nodejs -o jsonpath='{ .spec.rules[0].http.paths[0].backend.serviceName }'", returnStdout: false).trim()
-            echo activeService
-            if (activeService == "blue-nodejs-service") {
-                echo "Entrou no if"
+            //def ingress = sh(script: "kubectl get ingress nodejs -n nodejs --ignore-not-found", returnStatus: false)
+            //echo ingress
+            def svc = sh(script: "kubectl get svc nodejs-service -n nodejs -o jsonpath='{ .spec.selector.role }' --ignore-not-found", returnStdout: true).trim()
+            if (svc == "blue"){
+                echo "Rota Existe - Blue"
                 sh 'kubectl apply -f aks-nodejs-green.yaml --validate=false'
                 sh 'kubectl set image deployment/green-nodejs nodejs=cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} --record -n nodejs'
                 sh 'kubectl rollout status deployment.apps/green-nodejs -n nodejs'
-                sh """kubectl patch ingress nodejs -n nodejs --type='json' -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"green-nodejs-service"}]'"""
+                routeHost = sh(script: "kubectl get ingress green-nodejs -n nodejs -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
+                input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
+                sh """kubectl patch svc nodejs-service -n nodejs --type='json' -p='[{"op": "replace", "path": "/spec/selector/role", "value":"green"}]'"""
             }
             else {
-                echo "Entrou no Else"
-                sh 'kubectl apply -f aks-nodejs-blue.yaml --validate=false'
-                sh 'kubectl set image deployment/blue-nodejs nodejs=cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} --record -n nodejs'
-                sh 'kubectl rollout status deployment.apps/blue-nodejs -n nodejs'
-                sh """kubectl patch ingress nodejs -n nodejs --type='json' -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"blue-nodejs-service"}]'"""
+                if (svc == "green") {
+                    echo "Rota Existe - Verde"
+                    sh 'kubectl apply -f aks-nodejs-blue.yaml --validate=false'
+                    sh 'kubectl set image deployment/blue-nodejs nodejs=cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} --record -n nodejs'
+                    sh 'kubectl rollout status deployment.apps/blue-nodejs -n nodejs'
+                    routeHost = sh(script: "kubectl get ingress blue-nodejs -n nodejs -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
+                    input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
+                    sh """kubectl patch svc nodejs-service -n nodejs --type='json' -p='[{"op": "replace", "path": "/spec/selector/role", "value":"blue"}]'"""
+                }
+                else {
+                    echo "Não Existe"
+                    sh 'kubectl apply -f ingress.yaml --validate=false'
+                    sh 'kubectl apply -f aks-nodejs-blue.yaml --validate=false'
+                    sh 'kubectl set image deployment/blue-nodejs nodejs=cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} --record -n nodejs'
+                    sh 'kubectl rollout status deployment.apps/blue-nodejs -n nodejs'
+                    routeHost = sh(script: "kubectl get ingress blue-nodejs -n nodejs -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
+                    input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
+                }
             }
         }//stage
     }

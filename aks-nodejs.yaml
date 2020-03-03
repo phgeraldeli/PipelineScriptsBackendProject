@@ -1,7 +1,7 @@
 kind: Namespace
 apiVersion: v1
 metadata:
- name: nodejs
+ name: nodejs-qa
 spec:
  finalizers:
   - kubernetes
@@ -13,10 +13,12 @@ metadata:
     #kubernetes.io/ingress.class: addon-http-application-routing
     kubernetes.io/ingress.class: nginx
   name: nodejs
-  namespace: nodejs
+  namespace: nodejs-qa
+  labels:
+    app: nodejs
 spec:
   rules:
-    - host: nodejs.aks.linux4sysadmin.com.br
+    - host: nodejs-qa.aks.linux4sysadmin.com.br
       http:
         paths:
           - backend:
@@ -25,7 +27,7 @@ spec:
             path: /
   tls:
     - hosts:
-        - nodejs.aks.linux4sysadmin.com.br
+        - nodejs-qa.aks.linux4sysadmin.com.br
 ---
 apiVersion: v1
 data:
@@ -34,14 +36,16 @@ kind: Secret
 metadata:
   creationTimestamp: null
   name: acrregcred
-  namespace: nodejs
+  namespace: nodejs-qa
+  labels:
+    app: nodejs
 type: kubernetes.io/dockerconfigjson
 ---
 apiVersion: v1
 kind: Service
 metadata:
  name: nodejs-service
- namespace: nodejs
+ namespace: nodejs-qa
  labels:
    app: nodejs
 spec:
@@ -57,7 +61,7 @@ metadata:
  labels:
    app: nodejs
  name: nodejs
- namespace: nodejs
+ namespace: nodejs-qa
  annotations:  
    template.alpha.openshift.io/wait-for-ready: 'true'
 spec:
@@ -74,7 +78,7 @@ spec:
     - name: acrregcred
    containers: 
     - name: nodejs
-      image: cmotta2016.azurecr.io/k8s-nodejs
+      image: cmotta2016.azurecr.io/nodejs-qa
       imagePullPolicy: IfNotPresent
       resources:
         limits:
@@ -110,14 +114,16 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: nodejs
-  namespace: nodejs
+  namespace: nodejs-qa
+  labels:
+    app: nodejs
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: nodejs
-  minReplicas: 2
-  maxReplicas: 5
+  minReplicas: 1
+  maxReplicas: 2
   metrics:
   - type: Resource
     resource:
@@ -125,7 +131,7 @@ spec:
       #targetAverageUtilization: 90
       target:    # For use with v2beta2 version
         type: Utilization
-        averageUtilization: 70
+        averageUtilization: 90
 #---
 #apiVersion: autoscaling.k8s.io/v1
 #kind: VerticalPodAutoscaler

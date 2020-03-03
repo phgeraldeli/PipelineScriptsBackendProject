@@ -1,11 +1,11 @@
-kind: Namespace
-apiVersion: v1
-metadata:
- name: nodejs
-spec:
- finalizers:
-  - kubernetes
----
+#kind: Namespace
+#apiVersion: v1
+#metadata:
+# name: nodejs
+#spec:
+# finalizers:
+#  - kubernetes
+#---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -54,4 +54,6 @@ metadata:
   creationTimestamp: null
   name: acrregcred
   namespace: nodejs
+  labels:
+    app: nodejs
 type: kubernetes.io/dockerconfigjson

@@ -1,11 +1,3 @@
-kind: Namespace
-apiVersion: v1
-metadata:
- name: nodejs
-spec:
- finalizers:
-  - kubernetes
----
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -14,6 +6,9 @@ metadata:
     kubernetes.io/ingress.class: nginx
   name: blue-nodejs
   namespace: nodejs
+  labels:
+    app: nodejs
+    role: blue
 spec:
   rules:
     - host: blue-nodejs.aks.linux4sysadmin.com.br
@@ -26,16 +21,6 @@ spec:
   tls:
     - hosts:
         - blue-nodejs.aks.linux4sysadmin.com.br
----
-apiVersion: v1
-data:
-  .dockerconfigjson: eyJhdXRocyI6eyJjbW90dGEyMDE2LmF6dXJlY3IuaW8iOnsidXNlcm5hbWUiOiJjbW90dGEyMDE2IiwicGFzc3dvcmQiOiJBbWxUVG9jbWlaSldPNGVqODZXWC9NNXY5NlFBdGZ1dyIsImF1dGgiOiJZMjF2ZEhSaE1qQXhOanBCYld4VVZHOWpiV2xhU2xkUE5HVnFPRFpYV0M5Tk5YWTVObEZCZEdaMWR3PT0ifX19
-kind: Secret
-metadata:
-  creationTimestamp: null
-  name: acrregcred
-  namespace: nodejs
-type: kubernetes.io/dockerconfigjson
 ---
 # Blue Environment
 apiVersion: v1
@@ -81,7 +66,7 @@ spec:
    containers: 
     - name: nodejs
       image: cmotta2016.azurecr.io/k8s-nodejs
-      #imagePullPolicy: Always
+      imagePullPolicy: IfNotPresent
       resources:
         limits:
           cpu: '1'
@@ -117,6 +102,8 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: blue-nodejs
   namespace: nodejs
+  labels:
+    app: nodejs
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

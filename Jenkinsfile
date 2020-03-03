@@ -29,32 +29,40 @@ timestamps {
             }//timeout
         }//stage*/
         stage('Build with S2I'){
-            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} --loglevel 1 --network host'
+            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest cmotta2016.azurecr.io/nodejs-qa:${BUILD_NUMBER} --loglevel 1 --network host'
         }
         stage('Push Image to ACR'){
             withCredentials([usernamePassword(credentialsId: 'acr-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
             sh '''
             docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" cmotta2016.azurecr.io
-            docker tag cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} cmotta2016.azurecr.io/k8s-nodejs:latest
-            docker push cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER}
-            docker push cmotta2016.azurecr.io/k8s-nodejs:latest
-            docker rmi -f cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} cmotta2016.azurecr.io/k8s-nodejs:latest
+            docker tag cmotta2016.azurecr.io/nodejs-qa:${BUILD_NUMBER} cmotta2016.azurecr.io/nodejs-qa:latest
+            docker push cmotta2016.azurecr.io/nodejs-qa:${BUILD_NUMBER}
+            docker push cmotta2016.azurecr.io/nodejs-qa:latest
+            docker rmi -f cmotta2016.azurecr.io/nodejs-qa:${BUILD_NUMBER} cmotta2016.azurecr.io/nodejs-qa:latest
             '''
             }
         }
         stage('Deploy on AKS'){
-            sh 'kubectl apply -f aks-nodejs.yaml --validate=false'
+            def deployment = sh(script: "kubectl get deployment nodejs -n nodejs-qa -o jsonpath='{ .metadata.name }' --ignore-not-found", returnStdout: true).trim()
+            if (deployment == "nodejs") {
+                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/nodejs-qa:${BUILD_NUMBER} --record -n nodejs-qa'
+            }
+            else {
+                sh 'kubectl apply -f aks-nodejs.yaml --validate=false'
+            }
+            //sh 'kubectl apply -f aks-nodejs.yaml --validate=false'
             //sh 'kubectl apply -f aks-nodejs-blue.yaml --validate=false'
-            sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/k8s-nodejs:${BUILD_NUMBER} --record -n nodejs'
+            //sh 'sleep 30'
+            //sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/nodejs-qa:${BUILD_NUMBER} --record -n nodejs-qa'
             //sh 'kubectl rollout status deployment.apps/blue-nodejs -n nodejs
             //sh 'kubectl apply -f aks-nodejs.yaml --validate=false'
             //sh 'kubectl wait --for=condition=Available deployment/nodejs -n nodejs --timeout=90s'
-            sh 'kubectl rollout status deployment.apps/nodejs -n nodejs'
+            sh 'kubectl rollout status deployment.apps/nodejs -n nodejs-qa'
             //def routehost = sh(script: "kubectl get ingress nodejs -n nodejs -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
             //echo "http://routehost"
         }
         stage('Test Deployment'){
-            routeHost = sh(script: "kubectl get ingress nodejs -n nodejs -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
+            routeHost = sh(script: "kubectl get ingress nodejs -n nodejs-qa -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
             input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
         }
     }
