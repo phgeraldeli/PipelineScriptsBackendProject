@@ -1,8 +1,10 @@
 {
   "name": "Elastic-Beanstalk-Sample-App",
   "version": "1.2.209",
-  "private": true,
-  "dependencies": {},
+  "private": false,
+  "dependencies": {
+    "applicationinsights": "^1.7.2"
+  },
   "scripts": {
     "start": "node app.js",
     "test:mocha": "nyc --reporter=lcov mocha --exit --timeout 10000",

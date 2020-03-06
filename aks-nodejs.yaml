@@ -1,11 +1,3 @@
-kind: Namespace
-apiVersion: v1
-metadata:
- name: nodejs-qa
-spec:
- finalizers:
-  - kubernetes
----
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -13,9 +5,9 @@ metadata:
     #kubernetes.io/ingress.class: addon-http-application-routing
     kubernetes.io/ingress.class: nginx
   name: nodejs
-  namespace: nodejs-qa
   labels:
     app: nodejs
+    env: qa
 spec:
   rules:
     - host: nodejs-qa.aks.linux4sysadmin.com.br
@@ -34,23 +26,23 @@ data:
   .dockerconfigjson: eyJhdXRocyI6eyJjbW90dGEyMDE2LmF6dXJlY3IuaW8iOnsidXNlcm5hbWUiOiJjbW90dGEyMDE2IiwicGFzc3dvcmQiOiJBbWxUVG9jbWlaSldPNGVqODZXWC9NNXY5NlFBdGZ1dyIsImF1dGgiOiJZMjF2ZEhSaE1qQXhOanBCYld4VVZHOWpiV2xhU2xkUE5HVnFPRFpYV0M5Tk5YWTVObEZCZEdaMWR3PT0ifX19
 kind: Secret
 metadata:
-  creationTimestamp: null
   name: acrregcred
-  namespace: nodejs-qa
   labels:
     app: nodejs
+    env: qa
 type: kubernetes.io/dockerconfigjson
 ---
 apiVersion: v1
 kind: Service
 metadata:
  name: nodejs-service
- namespace: nodejs-qa
  labels:
    app: nodejs
+   env: qa
 spec:
  selector:
    app: nodejs
+   env: qa
  ports:
   - port: 8080
     targetPort: 3000
@@ -60,8 +52,8 @@ kind: Deployment
 metadata:
  labels:
    app: nodejs
+   env: qa
  name: nodejs
- namespace: nodejs-qa
  annotations:  
    template.alpha.openshift.io/wait-for-ready: 'true'
 spec:
@@ -69,17 +61,19 @@ spec:
  selector:
   matchLabels:
    app: nodejs
+   env: qa
  template:
   metadata:
    labels:
     app: nodejs
+    env: qa
   spec:
    imagePullSecrets:
     - name: acrregcred
    containers: 
     - name: nodejs
-      image: cmotta2016.azurecr.io/nodejs-qa
-      imagePullPolicy: IfNotPresent
+      image: " "
+      imagePullPolicy: Always
       resources:
         limits:
           cpu: '1'
@@ -114,9 +108,9 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: nodejs
-  namespace: nodejs-qa
   labels:
     app: nodejs
+    env: hml
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -128,8 +122,7 @@ spec:
   - type: Resource
     resource:
       name: cpu
-      #targetAverageUtilization: 90
-      target:    # For use with v2beta2 version
+      target: 
         type: Utilization
         averageUtilization: 90
 #---

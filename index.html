@@ -35,7 +35,7 @@
 
         text-align: right;
         padding-top: 11em;
-        background-color: #73A53E;
+        background-color: #3399FF;
 
       }
       .textColumn p {
@@ -72,21 +72,38 @@
       }
     </style>
   </head>
+  <!-- 
+  To collect user behavior analytics tools about your application, 
+  insert the following script into each page you want to track.
+  Place this code immediately before the closing </head> tag,
+  and before any other scripts. Your first data will appear 
+  automatically in just a few seconds.
+  -->
+  <script type="text/javascript">
+    var appInsights=window.appInsights||function(config){
+      function i(config){t[config]=function(){var i=arguments;t.queue.push(function(){t[config].apply(t,i)})}}var t={config:config},u=document,e=window,o="script",s="AuthenticatedUserContext",h="start",c="stop",l="Track",a=l+"Event",v=l+"Page",y=u.createElement(o),r,f;y.src=config.url||"https://az416426.vo.msecnd.net/scripts/a/ai.0.js";u.getElementsByTagName(o)[0].parentNode.appendChild(y);try{t.cookie=u.cookie}catch(p){}for(t.queue=[],t.version="1.0",r=["Event","Exception","Metric","PageView","Trace","Dependency"];r.length;)i("track"+r.pop());return i("set"+s),i("clear"+s),i(h+a),i(c+a),i(h+v),i(c+v),i("flush"),config.disableExceptionTracking||(r="onerror",i("_"+r),f=e[r],e[r]=function(config,i,u,e,o){var s=f&&f(config,i,u,e,o);return s!==!0&&t["_"+r](config,i,u,e,o),s}),t
+      }({
+          instrumentationKey:"InstrumentationKey=d0b63d01-5d4b-458a-b6ce-9ab8e9e59719"
+      });
+
+      window.appInsights=appInsights;
+      appInsights.trackPageView();
+  </script>
   <body>
     <div class="textColumn">
-      <h1>Congratulations Blue</h1>
-      <p>Your first AKS Node.js application is now running on your own dedicated environment in the AKS Cloud</p>
+      <h1>Congratulations</h1>
+      <p>Your first AKS Node.js application is now running on your own dedicated environment in the Azure</p>
     </div>
     <div class="linksColumn">
       <h2>What's Next?</h2>
       <ul>
-        <li><a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html">AWS Elastic Beanstalk overview</a></li>
-        <li><a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/concepts.html">AWS Elastic Beanstalk concepts</a></li>
-        <li><a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_nodejs_express.html">Deploy an Express Application to AWS Elastic Beanstalk</a></li>
-        <li><a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_nodejs_express_elasticache.html">Deploy an Express Application with Amazon ElastiCache to AWS Elastic Beanstalk</a></li>
-        <li><a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_nodejs_geddy_elasticache.html">Deploy a Geddy Application with Amazon ElastiCache to AWS Elastic Beanstalk </a></li>
-        <li><a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_nodejs_custom_container.html">Customizing and Configuring a Node.js Container </a></li>
-        <li><a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.loggingS3.title.html">Working with Logs</a></li>
+        <li><a href="https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-prepare-app">Prepare an application for Azure Kubernetes Service (AKS)</a></li>
+        <li><a href="https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-prepare-acr">Deploy and use Azure Container Registry</a></li>
+        <li><a href="https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-deploy-cluster">Deploy an Azure Kubernetes Service (AKS) cluster</a></li>
+        <li><a href="https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-deploy-application">Run applications in Azure Kubernetes Service (AKS)</a></li>
+        <li><a href="https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-scale">Scale applications in Azure Kubernetes Service (AKS)</a></li>
+        <li><a href="https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-app-update">Update an application in Azure Kubernetes Service (AKS)</a></li>
+        <li><a href="https://docs.microsoft.com/en-us/azure/aks/tutorial-kubernetes-upgrade-cluster">Upgrade Kubernetes in Azure Kubernetes Service (AKS)</a></li>
       </ul>
     </div>
   </body>

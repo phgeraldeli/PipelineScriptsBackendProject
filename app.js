@@ -3,6 +3,9 @@ var port = process.env.PORT || 3000,
     fs = require('fs'),
     html = fs.readFileSync('index.html');
 
+const appInsights = require('applicationinsights');
+appInsights.setup('InstrumentationKey=d0b63d01-5d4b-458a-b6ce-9ab8e9e59719').start();
+
 var log = function (entry) {
     fs.appendFileSync('/tmp/sample-app.log', new Date().toISOString() + ' - ' + entry + '\n');
 };

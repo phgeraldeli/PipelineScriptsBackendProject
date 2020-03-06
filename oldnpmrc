@@ -1,4 +1,2 @@
-#registry=https://pkgs.dev.azure.com/carlosmotta0608/_packaging/carlosmotta0608/npm/registry/
-#always-auth=true
 registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/
 always-auth=true

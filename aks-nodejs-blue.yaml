@@ -65,8 +65,9 @@ spec:
     - name: acrregcred
    containers: 
     - name: nodejs
-      image: cmotta2016.azurecr.io/k8s-nodejs
-      imagePullPolicy: IfNotPresent
+      #image: cmotta2016.azurecr.io/k8s-nodejs
+      image: " "
+      imagePullPolicy: Always
       resources:
         limits:
           cpu: '1'
