@@ -5,6 +5,7 @@ timestamps {
             //checkout([$class: 'GitSCM', branches: [[name: '*/aks']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/cmotta2016/PipelineScriptsBackendProject.git']]])
         }
         stage('Compile with Azure Artifacts'){
+            //Alterar o endereço do Artifacts abaixo
             sh 'npm config set registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/'
             sh 'npm config set always-auth=true'
             sh 'cp /opt/npm/.npmrc /home/jenkins/'
@@ -27,7 +28,8 @@ timestamps {
             }
         }
         stage('Build with S2I'){
-            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --loglevel 5 --network host --env npm_config_registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/ --inject /opt/npm:/opt/app-root/src'
+            //Ajustar o nome do registro ACR e o endereço do Artifacts
+            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --loglevel 1 --network host --env npm_config_registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/ --inject /opt/npm:/opt/app-root/src'
         }
         stage('Push Image to ACR'){
             withCredentials([usernamePassword(credentialsId: 'acr-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
@@ -41,23 +43,24 @@ timestamps {
             }
         }
         stage('Deploy QA'){
-            def deployment = sh(script: "kubectl get deployment nodejs -n nodejs-qa -o jsonpath='{ .metadata.name }' --ignore-not-found", returnStdout: true).trim()
+            sh 'kubectl config set-context nodejs-qa --namespace=nodejs-qa && kubectl config use-context nodejs-qa'
+            def deployment = sh(script: "kubectl get deployment nodejs -o jsonpath='{ .metadata.name }' --ignore-not-found", returnStdout: true).trim()
             if (deployment == "nodejs") {
-                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record -n nodejs-qa'
+                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record'
             }
             else {
-                sh 'kubectl create -f aks-nodejs.yaml --validate=false -l env!=hml -n nodejs-qa'
-                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record -n nodejs-qa'
+                sh 'kubectl create -f aks-nodejs.yaml --validate=false -l env!=hml'
+                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record'
             }
             //sh 'kubectl wait --for=condition=Ready deployment/nodejs -n nodejs-qa'
-            sh 'kubectl rollout status deployment.apps/nodejs -n nodejs-qa'
+            sh 'kubectl rollout status deployment.apps/nodejs'
         }
         /*stage('Promote to HML'){
             //routeHost = sh(script: "kubectl get ingress nodejs -n nodejs-qa -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
             input message: "Promote to HML. Approve?", id: "approval"
         }*/
         stage('Test Deployment'){
-            routeHost = sh(script: "kubectl get ingress nodejs -n nodejs-qa -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
+            routeHost = sh(script: "kubectl get ingress nodejs -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
             input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
         }
         /*stage('Deploy HML'){
