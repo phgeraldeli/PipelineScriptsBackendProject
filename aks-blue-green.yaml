@@ -18,7 +18,7 @@ metadata:
     role: principal
 spec:
   rules:
-    - host: nodejs.aks.linux4sysadmin.com.br
+    - host: nodejs.oisva.azure.msdigital.pro
       http:
         paths:
           - backend:
@@ -27,7 +27,7 @@ spec:
             path: /
   tls:
     - hosts:
-        - nodejs.aks.linux4sysadmin.com.br
+        - nodejs.oisva.azure.msdigital.pro
 ---
 apiVersion: v1
 kind: Service
@@ -50,8 +50,7 @@ data:
   .dockerconfigjson: eyJhdXRocyI6eyJjbW90dGEyMDE2LmF6dXJlY3IuaW8iOnsidXNlcm5hbWUiOiJjbW90dGEyMDE2IiwicGFzc3dvcmQiOiJBbWxUVG9jbWlaSldPNGVqODZXWC9NNXY5NlFBdGZ1dyIsImF1dGgiOiJZMjF2ZEhSaE1qQXhOanBCYld4VVZHOWpiV2xhU2xkUE5HVnFPRFpYV0M5Tk5YWTVObEZCZEdaMWR3PT0ifX19
 kind: Secret
 metadata:
-  creationTimestamp: null
-  name: acrregcred
+  name: acrcredentials
   namespace: nodejs-prd
   labels:
     app: nodejs
@@ -69,7 +68,7 @@ metadata:
     role: blue
 spec:
   rules:
-    - host: blue-nodejs.aks.linux4sysadmin.com.br
+    - host: blue-nodejs.oisva.azure.msdigital.pro
       http:
         paths:
           - backend:
@@ -78,7 +77,7 @@ spec:
             path: /
   tls:
     - hosts:
-        - blue-nodejs.aks.linux4sysadmin.com.br
+        - blue-nodejs.oisva.azure.msdigital.pro
 ---
 # Blue Environment
 apiVersion: v1
@@ -120,7 +119,7 @@ spec:
     role: blue
   spec:
    imagePullSecrets:
-    - name: acrregcred
+    - name: acrcredentials
    containers: 
     - name: nodejs
       image: " "
@@ -189,7 +188,7 @@ metadata:
     role: green
 spec:
   rules:
-    - host: green-nodejs.aks.linux4sysadmin.com.br
+    - host: green-nodejs.oisva.azure.msdigital.pro
       http:
         paths:
           - backend:
@@ -198,7 +197,7 @@ spec:
             path: /
   tls:
     - hosts:
-        - green-nodejs.aks.linux4sysadmin.com.br
+        - green-nodejs.oisva.azure.msdigital.pro
 ---
 # Green Environment
 apiVersion: v1
@@ -240,7 +239,7 @@ spec:
     role: green
   spec:
    imagePullSecrets:
-    - name: acrregcred
+    - name: acrcredentials
    containers: 
     - name: nodejs
       image: " "
