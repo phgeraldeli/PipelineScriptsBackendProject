@@ -7,7 +7,8 @@ timestamps {
             //checkout([$class: 'GitSCM', branches: [[name: '*/aks']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/cmotta2016/PipelineScriptsBackendProject.git']]])
         }
         stage('Compile with Azure Artifacts'){
-            sh 'npm config set registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/'
+            //sh 'npm config set registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/'
+            sh 'npm config set registry=https://pkgs.dev.azure.com/dvopsusroi/_packaging/dvopsusroi/npm/registry/'
             sh 'npm config set always-auth=true'
             sh 'cp /opt/npm/.npmrc /home/jenkins/'
             sh 'npm install'
@@ -29,16 +30,16 @@ timestamps {
             }
         }
         stage('Build with S2I'){
-            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --loglevel 5 --network host --env npm_config_registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/ --inject /opt/npm:/opt/app-root/src'
+            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER} --loglevel 5 --network host --env npm_config_registry=https://pkgs.dev.azure.com/dvopsusroi/_packaging/dvopsusroi/npm/registry/ --inject /opt/npm:/opt/app-root/src'
         }
         stage('Push Image to ACR'){
             withCredentials([usernamePassword(credentialsId: 'acr-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
             sh '''
-            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" cmotta2016.azurecr.io
-            docker tag cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} cmotta2016.azurecr.io/node-app:latest
-            docker push cmotta2016.azurecr.io/node-app:${BUILD_NUMBER}
-            docker push cmotta2016.azurecr.io/node-app:latest
-            docker rmi -f cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} cmotta2016.azurecr.io/node-app:latest
+            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" clusteraksregistryoi.azurecr.io
+            docker tag clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER} clusteraksregistryoi.azurecr.io/node-app:latest
+            docker push clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER}
+            docker push clusteraksregistryoi.azurecr.io/node-app:latest
+            docker rmi -f clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER} clusteraksregistryoi.azurecr.io/node-app:latest
             '''
             }
         }
@@ -46,11 +47,11 @@ timestamps {
             sh 'kubectl config set-context nodejs-qa --namespace=nodejs-qa && kubectl config use-context nodejs-qa'
             def deployment = sh(script: "kubectl get deployment nodejs -o jsonpath='{ .metadata.name }' --ignore-not-found", returnStdout: true).trim()
             if (deployment == "nodejs") {
-                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record'
+                sh 'kubectl set image deployment/nodejs nodejs=clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER} --record'
             }
             else {
                 sh 'kubectl create -f aks-nodejs.yaml --validate=false -l env!=hml'
-                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record'
+                sh 'kubectl set image deployment/nodejs nodejs=clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER} --record'
             }
             sh 'kubectl rollout status deployment.apps/nodejs'
         }
@@ -63,11 +64,11 @@ timestamps {
             sh 'kubectl config set-context nodejs-hml --namespace=nodejs-hml && kubectl config use-context nodejs-hml'
             def deployment = sh(script: "kubectl get deployment nodejs -o jsonpath='{ .metadata.name }' --ignore-not-found", returnStdout: true).trim()
             if (deployment == "nodejs") {
-                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record'
+                sh 'kubectl set image deployment/nodejs nodejs=clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER} --record'
             }
             else {
                 sh "kubectl create -f aks-nodejs.yaml --validate=false --dry-run -o yaml | sed 's/qa/hml/g' | kubectl apply --validate=false -f -"
-                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record'
+                sh 'kubectl set image deployment/nodejs nodejs=clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER} --record'
             }
             sh 'kubectl rollout status deployment.apps/nodejs'
         }
@@ -83,19 +84,19 @@ timestamps {
                 tag="green"
                 altTag="blue"
                 echo "Executando Rollout no Deployment ${tag}"
-                sh "kubectl set image deployment/${tag}-nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record"
+                sh "kubectl set image deployment/${tag}-nodejs nodejs=clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER} --record"
                 sh "kubectl rollout status deployment.apps/${tag}-nodejs"
             }
             else {
                 if (svc == "green") {
                     echo "Executando Rollout no Deployment ${tag}"
-                    sh "kubectl set image deployment/${tag}-nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record"
+                    sh "kubectl set image deployment/${tag}-nodejs nodejs=clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER} --record"
                     sh "kubectl rollout status deployment.apps/${tag}-nodejs"
                 }
                 else {
                     echo "Não Existe"
                     sh 'kubectl apply -f aks-blue-green.yaml --validate=false'
-                    sh "kubectl set image deployment/${tag}-nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record"
+                    sh "kubectl set image deployment/${tag}-nodejs nodejs=clusteraksregistryoi.azurecr.io/node-app:${BUILD_NUMBER} --record"
                     sh "kubectl rollout status deployment.apps/${tag}-nodejs"
                 }
             }
