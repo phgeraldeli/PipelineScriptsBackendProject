@@ -10,7 +10,7 @@ metadata:
     env: qa
 spec:
   rules:
-    - host: nodejs-qa.aks.linux4sysadmin.com.br
+    - host: nodejs-qa.oisva.azure.msdigital.pro
       http:
         paths:
           - backend:
@@ -19,7 +19,7 @@ spec:
             path: /
   tls:
     - hosts:
-        - nodejs-qa.aks.linux4sysadmin.com.br
+        - nodejs-qa.oisva.azure.msdigital.pro
 ---
 apiVersion: v1
 data:
