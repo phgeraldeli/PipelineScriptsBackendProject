@@ -30,7 +30,7 @@ timestamps {
         stage('Build with S2I'){
             //Ajustar o nome do registro ACR e o endereço do Artifacts
             //sh 's2i build . cmotta2016/nodejs-10-bases2i:latest myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER} --loglevel 5 --network host --env npm_config_registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/ --inject /opt/npm:/opt/app-root/src'
-            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER} --loglevel 5 --network host'
+            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER} --loglevel 1 --network host'
         }
         stage('Push Image to ACR'){
             withCredentials([usernamePassword(credentialsId: 'acr-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
