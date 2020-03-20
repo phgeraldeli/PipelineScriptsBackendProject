@@ -23,10 +23,12 @@ spec:
 ---
 apiVersion: v1
 data:
-  .dockerconfigjson: eyJhdXRocyI6eyJjbHVzdGVyYWtzcmVnaXN0cnlvaS5henVyZWNyLmlvIjp7InVzZXJuYW1lIjoiY2x1c3RlckFrc3JlZ2lzdHJ5b2kiLCJwYXNzd29yZCI6IjJrWmQvUHlJaXg0aXhoMjVURFVBbkx4TnY2K1pRRXA4IiwiZW1haWwiOiJkdm9wc3Vzcm9pQG91dGxvb2suY29tIiwiYXV0aCI6IlkyeDFjM1JsY2tGcmMzSmxaMmx6ZEhKNWIyazZNbXRhWkM5UWVVbHBlRFJwZUdneU5WUkVWVUZ1VEhoT2RqWXJXbEZGY0RnPSJ9fX0=
+  .dockerconfigjson: eyJhdXRocyI6eyJteXByb2plY3Q1NDM1MmVkZC5henVyZWNyLmlvIjp7InVzZXJuYW1lIjoibXlwcm9qZWN0NTQzNTJlZGQiLCJwYXNzd29yZCI6ImhJY2JITjE0ZW1mbUt0amR0YTFVRmlmQUkvbHpVSFNLIiwiYXV0aCI6ImJYbHdjbTlxWldOME5UUXpOVEpsWkdRNmFFbGpZa2hPTVRSbGJXWnRTM1JxWkhSaE1WVkdhV1pCU1M5c2VsVklVMHM9In19fQ==
 kind: Secret
 metadata:
-  name: acrcredentials
+  creationTimestamp: null
+  name: acr-credentials
+  namespace: cicd
 type: kubernetes.io/dockerconfigjson
 ---
 apiVersion: v1
@@ -66,7 +68,7 @@ spec:
     env: qa
   spec:
    imagePullSecrets:
-    - name: acrcredentials
+    - name: acr-credentials
    containers: 
     - name: nodejs
       image: " "
