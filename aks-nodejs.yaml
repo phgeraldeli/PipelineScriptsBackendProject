@@ -27,8 +27,7 @@ data:
 kind: Secret
 metadata:
   creationTimestamp: null
-  name: acrcredentials
-  namespace: cicd
+  name: acr-credentials
 type: kubernetes.io/dockerconfigjson
 ---
 apiVersion: v1
@@ -68,7 +67,7 @@ spec:
     env: qa
   spec:
    imagePullSecrets:
-    - name: acrcredentials
+    - name: acr-credentials
    containers: 
     - name: nodejs
       image: " "
