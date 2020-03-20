@@ -19,8 +19,8 @@ timestamps {
             sonar.codeQuality()
         }
         stage('Quality Gate'){
-            sleep(15)
-            timeout(activity: true, time: 15, unit: 'SECONDS') {
+            sleep(20)
+            timeout(activity: true, time: 20, unit: 'SECONDS') {
                 def qg = waitForQualityGate()
                 if (qg.status.toUpperCase() == 'ERROR') {
                     error "Pipeline aborted due to quality gate failure: ${qg.status}"
@@ -29,16 +29,16 @@ timestamps {
         }
         stage('Build with S2I'){
             //Ajustar o nome do registro ACR e o endereço do Artifacts
-            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --loglevel 1 --network host --env npm_config_registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/ --inject /opt/npm:/opt/app-root/src'
+            sh 's2i build . cmotta2016/nodejs-10-bases2i:latest myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER} --loglevel 1 --network host --env npm_config_registry=https://pkgs.dev.azure.com/carlosmotta0608/cicd/_packaging/npm-feed/npm/registry/ --inject /opt/npm:/opt/app-root/src'
         }
         stage('Push Image to ACR'){
             withCredentials([usernamePassword(credentialsId: 'acr-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
             sh '''
-            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" cmotta2016.azurecr.io
-            docker tag cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} cmotta2016.azurecr.io/node-app:latest
-            docker push cmotta2016.azurecr.io/node-app:${BUILD_NUMBER}
-            docker push cmotta2016.azurecr.io/node-app:latest
-            docker rmi -f cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} cmotta2016.azurecr.io/node-app:latest
+            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" myproject54352edd.azurecr.io
+            docker tag myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER} myproject54352edd.azurecr.io/node-app:latest
+            docker push myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER}
+            docker push myproject54352edd.azurecr.io/node-app:latest
+            docker rmi -f myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER} myproject54352edd.azurecr.io/node-app:latest
             '''
             }
         }
@@ -46,11 +46,11 @@ timestamps {
             sh 'kubectl config set-context nodejs-qa --namespace=nodejs-qa && kubectl config use-context nodejs-qa'
             def deployment = sh(script: "kubectl get deployment nodejs -o jsonpath='{ .metadata.name }' --ignore-not-found", returnStdout: true).trim()
             if (deployment == "nodejs") {
-                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record'
+                sh 'kubectl set image deployment/nodejs nodejs=myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER} --record'
             }
             else {
                 sh 'kubectl create -f aks-nodejs.yaml --validate=false -l env!=hml'
-                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record'
+                sh 'kubectl set image deployment/nodejs nodejs=myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER} --record'
             }
             //sh 'kubectl wait --for=condition=Ready deployment/nodejs -n nodejs-qa'
             sh 'kubectl rollout status deployment.apps/nodejs'
