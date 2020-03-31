@@ -22,15 +22,6 @@ spec:
         - nodejs-qa.oisva.azure.msdigital.pro
 ---
 apiVersion: v1
-data:
-  .dockerconfigjson: eyJhdXRocyI6eyJteXByb2plY3Q1NDM1MmVkZC5henVyZWNyLmlvIjp7InVzZXJuYW1lIjoibXlwcm9qZWN0NTQzNTJlZGQiLCJwYXNzd29yZCI6ImhJY2JITjE0ZW1mbUt0amR0YTFVRmlmQUkvbHpVSFNLIiwiYXV0aCI6ImJYbHdjbTlxWldOME5UUXpOVEpsWkdRNmFFbGpZa2hPTVRSbGJXWnRTM1JxWkhSaE1WVkdhV1pCU1M5c2VsVklVMHM9In19fQ==
-kind: Secret
-metadata:
-  creationTimestamp: null
-  name: acr-credentials
-type: kubernetes.io/dockerconfigjson
----
-apiVersion: v1
 kind: Service
 metadata:
  name: nodejs-service
