@@ -47,10 +47,11 @@ spec:
 ---
 apiVersion: v1
 data:
-  .dockerconfigjson: eyJhdXRocyI6eyJjbHVzdGVyYWtzcmVnaXN0cnlvaS5henVyZWNyLmlvIjp7InVzZXJuYW1lIjoiY2x1c3RlckFrc3JlZ2lzdHJ5b2kiLCJwYXNzd29yZCI6IjJrWmQvUHlJaXg0aXhoMjVURFVBbkx4TnY2K1pRRXA4IiwiZW1haWwiOiJkdm9wc3Vzcm9pQG91dGxvb2suY29tIiwiYXV0aCI6IlkyeDFjM1JsY2tGcmMzSmxaMmx6ZEhKNWIyazZNbXRhWkM5UWVVbHBlRFJwZUdneU5WUkVWVUZ1VEhoT2RqWXJXbEZGY0RnPSJ9fX0=
+  .dockerconfigjson: eyJhdXRocyI6eyJjbHVzdGVyYWtzcmVnaXN0cnlvaS5henVyZWNyLmlvIjp7InVzZXJuYW1lIjoiY2x1c3RlcmFrc3JlZ2lzdHJ5b2kiLCJwYXNzd29yZCI6IjJrWmQvUHlJaXg0aXhoMjVURFVBbkx4TnY2K1pRRXA4IiwiYXV0aCI6IlkyeDFjM1JsY21GcmMzSmxaMmx6ZEhKNWIyazZNbXRhWkM5UWVVbHBlRFJwZUdneU5WUkVWVUZ1VEhoT2RqWXJXbEZGY0RnPSJ9fX0=
 kind: Secret
 metadata:
-  name: acrcredentials
+  creationTimestamp: null
+  name: acr-credentials
 type: kubernetes.io/dockerconfigjson
 ---
 apiVersion: extensions/v1beta1
@@ -116,7 +117,7 @@ spec:
     role: blue
   spec:
    imagePullSecrets:
-    - name: acrcredentials
+    - name: acr-credentials
    containers: 
     - name: nodejs
       image: " "
@@ -236,7 +237,7 @@ spec:
     role: green
   spec:
    imagePullSecrets:
-    - name: acrcredentials
+    - name: acr-credentials
    containers: 
     - name: nodejs
       image: " "
