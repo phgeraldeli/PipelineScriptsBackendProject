@@ -23,7 +23,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  .dockerconfigjson: eyJhdXRocyI6eyJjbHVzdGVyYWtzcmVnaXN0cnlvaS5henVyZWNyLmlvIjp7InVzZXJuYW1lIjoiY2x1c3RlcmFrc3JlZ2lzdHJ5b2kiLCJwYXNzd29yZCI6IjJrWmQvUHlJaXg0aXhoMjVURFVBbkx4TnY2K1pRRXA4IiwiYXV0aCI6IlkyeDFjM1JsY21GcmMzSmxaMmx6ZEhKNWIyazZNbXRhWkM5UWVVbHBlRFJwZUdneU5WUkVWVUZ1VEhoT2RqWXJXbEZGY0RnPSJ9fX0=
+  .dockerconfigjson: 
 kind: Secret
 metadata:
   creationTimestamp: null
