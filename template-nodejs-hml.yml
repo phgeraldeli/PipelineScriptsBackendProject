@@ -105,6 +105,7 @@ objects:
   metadata:
     labels:
       app: "${LABEL}"
+      environment: "hml"
     name: "${NAME}"
   spec:
     maxReplicas: 10
