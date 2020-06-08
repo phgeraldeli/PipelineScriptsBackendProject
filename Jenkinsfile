@@ -13,6 +13,7 @@ timestamps{
         }
         stage('Dependency Check'){
            sh 'oc create -f job.yaml'
+           sh 'sleep 10'
            sh 'oc logs -f job/dependency-nodejs'
            sh 'oc delete -f job.yaml'
         }
