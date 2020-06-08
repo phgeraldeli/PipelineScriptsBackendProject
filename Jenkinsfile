@@ -12,7 +12,7 @@ timestamps{
             sh 'npm test'
         }
         stage('Dependency Check'){
-           sh 'oc create -f jobs.yaml'
+           sh 'oc create -f job.yaml'
            sh 'oc logs -f job/dependency-nodejs'
         }
         /*stage ('Code Quality'){
