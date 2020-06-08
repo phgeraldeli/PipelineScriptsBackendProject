@@ -11,17 +11,22 @@ timestamps{
         stage('Test'){
             sh 'npm test'
         }
-        stage('Dependency Check'){
+        /*stage('Dependency Check'){
            sh 'oc create -f job.yaml'
            sh 'sleep 10'
            sh 'oc logs -f job/dependency-nodejs'
            sh 'oc delete -f job.yaml'
-        }
+        }*/
         /*stage ('Code Quality'){
             def sonar = load 'sonar.groovy'
             sonar.codeQuality()
         }*/
         openshift.withCluster() {
+           stage('Dependency Check'){
+              def job = openshift.create(openshift.process(readFile(file:"job.yaml")
+              job.logs('-f')
+              openshift.selector("job", "dependency-nodejs").delete()
+           }
             openshift.withProject("${PROJECT}-qa") {
                 stage('Build'){
                     if (!openshift.selector("bc", "${NAME}").exists()) {
