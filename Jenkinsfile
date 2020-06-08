@@ -22,11 +22,13 @@ timestamps{
             sonar.codeQuality()
         }*/
         openshift.withCluster() {
-           stage('Dependency Check'){
-              def job = openshift.create(openshift.process(readFile(file:"job.yaml")
-              job.logs('-f')
-              openshift.selector("job", "dependency-nodejs").delete()
-           }
+            openshift.withProject("cicd") {
+              stage('Dependency Check'){
+                def job = openshift.create(openshift.process(readFile(file:"job.yaml")
+                job.logs('-f')
+                openshift.selector("job", "dependency-nodejs").delete()
+              }
+            }
             openshift.withProject("${PROJECT}-qa") {
                 stage('Build'){
                     if (!openshift.selector("bc", "${NAME}").exists()) {
