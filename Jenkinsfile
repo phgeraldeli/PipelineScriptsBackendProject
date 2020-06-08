@@ -11,6 +11,10 @@ timestamps{
         stage('Test'){
             sh 'npm test'
         }
+        stage('Dependency Check'){
+           sh 'oc create -f jobs.yaml'
+           sh 'oc logs -f job/dependency-nodejs'
+        }
         /*stage ('Code Quality'){
             def sonar = load 'sonar.groovy'
             sonar.codeQuality()
