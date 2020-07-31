@@ -126,4 +126,4 @@ parameters:
   #value: marketing-management-v1
 - name: REPOSITORY
   displayName: Repository of app image
-  required: false
+  required: true
