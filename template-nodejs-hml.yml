@@ -55,7 +55,7 @@ objects:
         from: 
           kind: ImageStreamTag
           name: "${NAME}:latest"
-          namespace: "node-backend-qa"
+          namespace: "${REPOSITORY}"
     - type: ConfigChange
     replicas: 1
     selector:
@@ -124,3 +124,6 @@ parameters:
   displayName: App label
   required: true
   #value: marketing-management-v1
+- name: REPOSITORY
+  displayName: Repository of app image
+  required: true
