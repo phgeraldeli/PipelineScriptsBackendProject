@@ -23,6 +23,15 @@ timestamps{
             def sonar = load 'sonar.groovy'
             sonar.codeQuality()
         }
+        stage('Quality Gate'){
+            sleep(20)
+            timeout(activity: true, time: 20, unit: 'SECONDS') {
+                def qg = waitForQualityGate()
+                if (qg.status.toUpperCase() == 'ERROR') {
+                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                }
+            }
+        }
         openshift.withCluster() {
             /*openshift.withProject("cicd") {
               stage('Dependency Check'){
@@ -59,6 +68,10 @@ timestamps{
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
                 }//stage
+		stage('Promote to HML'){
+		    //routeHost = sh(script: "kubectl get ingress nodejs -n nodejs-qa -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
+		    input message: "Promote to HML. Approve?", id: "approval"
+		}
             }//withProject
             openshift.withProject("${PROJECT}-hml") {
                 stage('Deploy HML') {
@@ -68,6 +81,10 @@ timestamps{
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
                 }//stage
+		stage('Test Deployment'){
+		    routeHost = openshift.raw("get route ${NAME} -o jsonpath='{ .spec.host }' --loglevel=4").out.trim()
+		    input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
+		}
             }//withProject
         }//withCluster
     }//node
