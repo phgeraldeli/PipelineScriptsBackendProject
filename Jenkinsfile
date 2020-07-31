@@ -54,7 +54,7 @@ timestamps{
                 }//stage
                 stage('Deploy QA') {
                     echo "Criando Deployment"
-                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-unique.yml"), "--param-file=template_environments"), "-l environment!=hml")
+                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-qa.yml"), "--param-file=template_environments"))
                     openshift.selector("dc", "${NAME}").rollout().latest()
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
@@ -63,7 +63,7 @@ timestamps{
             openshift.withProject("${PROJECT}-hml") {
                 stage('Deploy HML') {
                     echo "Criando Deployment"
-                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-unique.yml"), "--param-file=template_environments"))
+                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-hml.yml"), "--param-file=template_environments"))
                     openshift.selector("dc", "${NAME}").rollout().latest()
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
