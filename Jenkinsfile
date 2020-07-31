@@ -45,7 +45,7 @@ timestamps{
                     if (!openshift.selector("bc", "${NAME}").exists()) {
                         echo "Criando build"
                         //def nb = openshift.newBuild(".", "--strategy=source", "--image-stream=${IMAGE_BUILDER}", "--allow-missing-images", "--name=${NAME}", "-l app=${LABEL}")
-                        def nb = openshift.newBuild("--name=${NAME}", "--image-stream=${IMAGE_BUILDER}", "--binary", "-l app=${NAME}", "--build-secret npmrc:.")
+                        def nb = openshift.newBuild("--name=${NAME}", "--image-stream=${IMAGE_BUILDER}", "--binary", "-l app=${NAME}", "--build-config-map npmrc:.")
                         def buildSelector = nb.narrow("bc").related("builds")
                         buildSelector.logs('-f')
                         def build = openshift.selector("bc", "${NAME}").startBuild("--from-archive=teste-build.tgz")
