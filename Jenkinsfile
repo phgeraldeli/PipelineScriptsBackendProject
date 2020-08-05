@@ -11,7 +11,7 @@ timestamps{
             sh 'tar czvf teste-build.tgz * --exclude node_modules'
         }
         stage('Test'){
-	    sh 'rm -rf /tmp/workspace/Openshift/Nodejs/report/*'
+	    //sh 'rm -rf /tmp/workspace/Openshift/Nodejs/report/*'
             sh 'npm test'
         }
         stage ('Code Quality'){
