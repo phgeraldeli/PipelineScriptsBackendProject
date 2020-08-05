@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: dependency-nodejs
+  name: node-backend-v1-depcheck
 spec:
   template:
     spec:
@@ -25,7 +25,7 @@ spec:
           -  '/src/Openshift/Nodejs/report'
           - '--noupdate'
         image: "owasp/dependency-check:latest"
-        name: dependency-check
+        name: node-backend-v1
         volumeMounts:
           - mountPath: /src
             name: workspace
