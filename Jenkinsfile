@@ -13,12 +13,6 @@ timestamps{
         stage('Test'){
             sh 'npm test'
         }
-        stage('Dependency Check'){
-           sh 'oc create -f job.yaml'
-           sh 'sleep 10'
-           sh 'oc logs -f job/node-backend-v1-depcheck'
-           sh 'oc delete -f job.yaml'
-        }
         stage ('Code Quality'){
             def sonar = load 'sonar.groovy'
             sonar.codeQuality()
@@ -31,6 +25,12 @@ timestamps{
                     error "Pipeline aborted due to quality gate failure: ${qg.status}"
                 }
             }
+        }
+        stage('Dependency Check'){
+           sh 'oc create -f job.yaml'
+           sh 'sleep 10'
+           sh 'oc logs -f job/node-backend-v1-depcheck'
+           sh 'oc delete -f job.yaml'
         }
         openshift.withCluster() {
             /*openshift.withProject("cicd") {
