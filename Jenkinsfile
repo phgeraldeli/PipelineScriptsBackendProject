@@ -13,12 +13,12 @@ timestamps{
         stage('Test'){
             sh 'npm test'
         }
-        /*stage('Dependency Check'){
+        stage('Dependency Check'){
            sh 'oc create -f job.yaml'
            sh 'sleep 10'
-           sh 'oc logs -f job/dependency-nodejs'
+           sh 'oc logs -f job/node-backend-v1-depcheck'
            sh 'oc delete -f job.yaml'
-        }*/
+        }
         stage ('Code Quality'){
             def sonar = load 'sonar.groovy'
             sonar.codeQuality()
@@ -33,20 +33,21 @@ timestamps{
             }
         }
         openshift.withCluster() {
-            openshift.withProject("cicd") {
+            /*openshift.withProject("cicd") {
               stage('Dependency Check'){
-		if (!openshift.selector("jobs", "${NAME}-depcheck").exists()) {      
+		if (!openshift.selector("job", "${NAME}-depcheck").exists()) {      
                 	def job = openshift.create(openshift.process(readFile(file:"job.yaml")))
+			//def pods = openshift.selector("job", "${NAME}-depcheck").related("pod")
                 	job.logs('-f')
                 	openshift.selector("job", "${NAME}-depcheck").delete()
 		}//if
 		else {
 			openshift.selector("job", "${NAME}-depcheck").delete()
-			def job = openshift.create(openshift.process(readFile(file:"job.yaml")))
+			def job = openshift.apply(openshift.process(readFile(file:"job.yaml")))
                 	job.logs('-f')
 		}//else
               }//stage
-            }//withProject
+            }//withProject*/
             openshift.withProject("${PROJECT}-qa") {
                 stage('Build'){
                     if (!openshift.selector("bc", "${NAME}").exists()) {
