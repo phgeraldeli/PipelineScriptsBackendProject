@@ -33,13 +33,20 @@ timestamps{
             }
         }
         openshift.withCluster() {
-            /*openshift.withProject("cicd") {
+            openshift.withProject("cicd") {
               stage('Dependency Check'){
-                def job = openshift.create(openshift.process(readFile(file:"job.yaml")))
-                job.logs('-f')
-                openshift.selector("job", "dependency-nodejs").delete()
-              }
-            }*/
+		if (!openshift.selector("jobs", "${NAME}-depcheck").exists()) {      
+                	def job = openshift.create(openshift.process(readFile(file:"job.yaml")))
+                	job.logs('-f')
+                	openshift.selector("job", "${NAME}-depcheck").delete()
+		}//if
+		else {
+			openshift.selector("job", "${NAME}-depcheck").delete()
+			def job = openshift.create(openshift.process(readFile(file:"job.yaml")))
+                	job.logs('-f')
+		}//else
+              }//stage
+            }//withProject
             openshift.withProject("${PROJECT}-qa") {
                 stage('Build'){
                     if (!openshift.selector("bc", "${NAME}").exists()) {
