@@ -99,7 +99,7 @@ timestamps{
 	    openshift.withProject("${PROJECT}-prd") {
                 stage('Deploy PRD') {
 		    echo "Criando Deployment"
-                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-prd.yml"), "--param-file=template_environments_hml"))
+                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-hml.yml"), "--param-file=template_environments_hml"))
                     openshift.selector("dc", "${NAME}").rollout().latest()
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
