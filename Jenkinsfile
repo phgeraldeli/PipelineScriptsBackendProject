@@ -96,7 +96,7 @@ timestamps{
 		    input message: "Promote to PRD. Test deployment: http://${routeHost}. Approve?", id: "approval"
 		}
             }//withProject
-	    openshift.withProject("${PROJECT}-prd") {
+	    /*openshift.withProject("${PROJECT}-prd") {
                 stage('Deploy PRD') {
 		    echo "Criando Deployment"
                     openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-hml.yml"), "--param-file=template_environments_hml"))
@@ -108,7 +108,7 @@ timestamps{
 		    routeHost = openshift.raw("get route ${NAME} -o jsonpath='{ .spec.host }' --loglevel=4").out.trim()
 		    input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
 		}
-            }//withProject
+            }//withProject*/
         }//withCluster
     }//node
 }//timestamps
