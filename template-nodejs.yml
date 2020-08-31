@@ -149,7 +149,7 @@ objects:
     selector:
       app: "${NAME}"
       deploymentconfig: ${NAME}-green
-      name: ${NAME}-blue
+      name: ${NAME}-green
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
