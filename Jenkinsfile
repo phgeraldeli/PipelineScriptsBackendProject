@@ -24,7 +24,7 @@ timestamps{
                 }//stage
                 stage('Deploy PRD') {
                     echo "Applying Template PRD"
-		    openshift.apply(openshift.process(readFile(file:'template-blue-green.yml'), "--param-file=environments-template"))
+		    openshift.apply(openshift.process(readFile(file:'template-nodejs.yml'), "--param-file=template_environments"))
 		    /*if (openshift.selector("route", "${NAME}").exists()) {
                     	openshift.apply(openshift.process(readFile(file:'template-blue-green.yml'), "--param-file=environments-template"), "-l name!=principal")
 		    } else {
