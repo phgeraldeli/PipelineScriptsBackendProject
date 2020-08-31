@@ -68,7 +68,6 @@ timestamps{
                 }//stage
                 stage('Tagging Image'){
 		            openshift.tag("${NAME}:latest", "${REPOSITORY}/${NAME}:latest")
-                    //openshift.tag("${NAME}:latest", "${REPOSITORY}/${NAME}:${tag}")
                 }//stage
                 stage('Deploy QA') {
                     echo "Criando Deployment"
@@ -77,11 +76,11 @@ timestamps{
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
                 }//stage
-		stage('Promote to HML'){
-		    //routeHost = sh(script: "kubectl get ingress nodejs -n nodejs-qa -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
-		    routeHost = openshift.raw("get route ${NAME} -o jsonpath='{ .spec.host }' --loglevel=4").out.trim()
-		    input message: "Promote to HML. Test deployment: http://${routeHost}. Approve?", id: "approval"
-		}
+                stage('Promote to HML'){
+                    //routeHost = sh(script: "kubectl get ingress nodejs -n nodejs-qa -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
+                    routeHost = openshift.raw("get route ${NAME} -o jsonpath='{ .spec.host }' --loglevel=4").out.trim()
+                    input message: "Promote to HML. Test deployment: http://${routeHost}. Approve?", id: "approval"
+                }
             }//withProject
             openshift.withProject("${PROJECT}-hml") {
                 stage('Deploy HML') {
@@ -91,24 +90,7 @@ timestamps{
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
                 }//stage
-		stage('Promote to PRD'){
-		    routeHost = openshift.raw("get route ${NAME} -o jsonpath='{ .spec.host }' --loglevel=4").out.trim()
-		    input message: "Promote to PRD. Test deployment: http://${routeHost}. Approve?", id: "approval"
-		}
             }//withProject
-	    /*openshift.withProject("${PROJECT}-prd") {
-                stage('Deploy PRD') {
-		    echo "Criando Deployment"
-                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-hml.yml"), "--param-file=template_environments_hml"))
-                    openshift.selector("dc", "${NAME}").rollout().latest()
-                    def dc = openshift.selector("dc", "${NAME}")
-                    dc.rollout().status()
-                }//stage
-		stage('Test Deployment'){
-		    routeHost = openshift.raw("get route ${NAME} -o jsonpath='{ .spec.host }' --loglevel=4").out.trim()
-		    input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
-		}
-            }//withProject*/
         }//withCluster
     }//node
 }//timestamps
