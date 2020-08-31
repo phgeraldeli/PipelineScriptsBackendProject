@@ -1,58 +1,31 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: nodejs-dev-build
+  template: "${NAME}"
 metadata:
-  name: nodejs-dev-build
+  name: "${NAME}"
 objects:
 - apiVersion: v1
-  kind: ImageStream
+  kind: Route
   metadata:
     labels:
-      app: "${LABEL}"
-    annotations:
-      description: Keeps track of changes in the application image
-    name: "${NAME}"
-- apiVersion: build.openshift.io/v1
-  kind: BuildConfig
-  metadata:
-    labels: 
-      app: "${LABEL}"
-    name: "${NAME}"
+      app: ${LABEL}
+      name: "principal"
+    name: ${NAME}
   spec:
-    source:
-      type: Git
-      git:
-        ref: openshift
-        uri: 'https://github.com/cmotta2016/PipelineScriptsBackendProject.git'
-    strategy:
-      type: Source
-      sourceStrategy:
-        from:
-          kind: ImageStreamTag
-          name: 'nodejs:8'
-          namespace: openshift
-    output:
-      to:
-        kind: ImageStreamTag
-        name: "${NAME}:latest"
-    triggers:
-    - type: ImageChange
-    - type: ConfigChange
-    - type: GitHub
-      github:
-        secret: secret101
-    - type: Generic
-      generic:
-        secret: secret101
-    postCommit: {}
-    runPolicy: Serial
+    alternateBackends:
+    - name: ${NAME}-green
+      weight: 0
+    to:
+      kind: Service
+      name: ${NAME}-blue
+      weight: 100
 - apiVersion: v1
   kind: Service
   metadata:
     labels:
       app: "${LABEL}"
-    name: "${NAME}"
+    name: ${NAME}-blue
   spec:
     ports:
     - name: web
@@ -61,13 +34,14 @@ objects:
       targetPort: 3000
     selector:
       app: "${NAME}"
-      deploymentconfig: "${NAME}"
+      deploymentconfig: ${NAME}-blue
+      name: ${NAME}-blue
 - apiVersion: route.openshift.io/v1
   kind: Route
   metadata:
     labels:
       app: "${LABEL}"
-    name: "${NAME}"
+    name: blue-${NAME}
   spec:
     port:
       targetPort: web
@@ -76,42 +50,201 @@ objects:
       termination: edge
     to:
       kind: Service
-      name: "${NAME}"
+      name: ${NAME}-blue
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:
     labels:
       app: "${LABEL}"
-    name: "${NAME}"
+    name: ${NAME}-blue
+    annotations:  
+      template.alpha.openshift.io/wait-for-ready: 'true'
   spec:
     strategy:
       type: "Rolling"
     triggers:
     - type: ImageChange
       imageChangeParams:
-        automatic: true
+        automatic: false
         containerNames:
         - "${NAME}"
         from: 
           kind: ImageStreamTag
-          name: "${NAME}:latest"
+          name: "${NAME}:blue"
+          namespace: "${REPOSITORY}"
     - type: ConfigChange
     replicas: 1
     selector:
       app: "${NAME}"
       deploymentconfig: "${NAME}"
+      name: ${NAME}-blue
     template:
       metadata:
         labels:
           app: "${LABEL}"
           deploymentconfig: "${NAME}"
+          name: ${NAME}-blue
       spec:
         containers:
         - image: " "
           name: "${NAME}"
+          resources:
+            limits:
+              cpu: 250m
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 1Gi
           ports:
             - containerPort: 3000
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+- apiVersion: autoscaling/v1
+  kind: HorizontalPodAutoscaler
+  metadata:
+    labels:
+      app: "${LABEL}"
+    name: ${NAME}-blue
+  spec:
+    maxReplicas: 10
+    minReplicas: 3
+    scaleTargetRef:
+      apiVersion: v1
+      kind: DeploymentConfig
+      name: "${NAME}-blue"
+    targetCPUUtilizationPercentage: 80
+### Green Objects
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: "${LABEL}"
+    name: ${NAME}-green
+  spec:
+    ports:
+    - name: web
+      port: 8080
+      protocol: TCP
+      targetPort: 3000
+    selector:
+      app: "${NAME}"
+      deploymentconfig: ${NAME}-green
+      name: ${NAME}-blue
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: "${LABEL}"
+    name: green-${NAME}
+  spec:
+    port:
+      targetPort: web
+    tls:
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+    to:
+      kind: Service
+      name: ${NAME}-green
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: "${LABEL}"
+    name: ${NAME}-green
+    annotations:  
+      template.alpha.openshift.io/wait-for-ready: 'true'
+  spec:
+    strategy:
+      type: "Rolling"
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: false
+        containerNames:
+        - "${NAME}"
+        from: 
+          kind: ImageStreamTag
+          name: "${NAME}:green"
+          namespace: "${REPOSITORY}"
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      app: "${NAME}"
+      deploymentconfig: "${NAME}"
+      name: ${NAME}-green
+    template:
+      metadata:
+        labels:
+          app: "${LABEL}"
+          deploymentconfig: "${NAME}"
+          name: ${NAME}-green
+      spec:
+        containers:
+        - image: " "
+          name: "${NAME}"
+          resources:
+            limits:
+              cpu: 250m
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 1Gi
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            timeoutSeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+- apiVersion: autoscaling/v1
+  kind: HorizontalPodAutoscaler
+  metadata:
+    labels:
+      app: "${LABEL}"
+    name: ${NAME}-green
+  spec:
+    maxReplicas: 10
+    minReplicas: 3
+    scaleTargetRef:
+      apiVersion: v1
+      kind: DeploymentConfig
+      name: "${NAME}-green"
+    targetCPUUtilizationPercentage: 80
 parameters:
 - name: NAME
   displayName: Name
@@ -120,4 +253,7 @@ parameters:
 - name: LABEL
   displayName: App label
   required: true
-  value: nodejs-example
+  #value: marketing-management-v1
+- name: REPOSITORY
+  displayName: Repository of app image
+  required: true
