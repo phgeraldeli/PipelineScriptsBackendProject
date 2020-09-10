@@ -1,0 +1,24 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: dependency-update-cron
+spec:
+  schedule: "00 6 * * *"  
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: dependency-data-dir
+              persistentVolumeClaim:
+                claimName: owasp-datadir
+          restartPolicy: Never
+          containers:
+          - args:
+              - '--updateonly'
+            image: "owasp/dependency-check:5.3.2"
+            name: dependency-check-cron
+            volumeMounts:
+              - mountPath: /usr/share/dependency-check/data
+                name: dependency-data-dir
+      backoffLimit: 3
