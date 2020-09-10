@@ -8,7 +8,7 @@ spec:
       volumes:
         - name: workspace
           persistentVolumeClaim:
-            claimName: node-workspace
+            claimName: pvc-cache-nodejs
         - name: dependency-data-dir
           persistentVolumeClaim:
             claimName: owasp-datadir
