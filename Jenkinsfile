@@ -28,10 +28,10 @@ timestamps{
             }
         }
         stage('Dependency Check'){
-           sh 'oc create -f depcheck_job_scan.yaml.yaml'
+           sh 'oc create -f depcheck_job_scan.yaml'
            sh 'sleep 10'
            sh 'oc logs -f job/node-backend-v1-depcheck'
-           sh 'oc delete -f depcheck_job_scan.yaml.yaml'
+           sh 'oc delete -f depcheck_job_scan.yaml'
         }
         openshift.withCluster() {
             /*openshift.withProject("cicd") {
