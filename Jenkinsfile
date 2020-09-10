@@ -10,45 +10,7 @@ timestamps{
             sh 'rm -rf teste-build.tgz > /dev/null 2>&1'
             sh 'tar czvf teste-build.tgz * --exclude node_modules'
         }
-        stage('Test'){
-	    //sh 'rm -rf /tmp/workspace/Openshift/Nodejs/report/*'
-            sh 'npm test'
-        }
-        stage ('Code Quality'){
-            def sonar = load 'sonar.groovy'
-            sonar.codeQuality()
-        }
-        stage('Quality Gate'){
-            sleep(20)
-            timeout(activity: true, time: 20, unit: 'SECONDS') {
-                def qg = waitForQualityGate()
-                if (qg.status.toUpperCase() == 'ERROR') {
-                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                }
-            }
-        }
-        stage('Dependency Check'){
-           sh 'oc create -f job.yaml'
-           sh 'sleep 10'
-           sh 'oc logs -f job/node-backend-v1-depcheck'
-           sh 'oc delete -f job.yaml'
-        }
         openshift.withCluster() {
-            /*openshift.withProject("cicd") {
-              stage('Dependency Check'){
-		if (!openshift.selector("job", "${NAME}-depcheck").exists()) {      
-                	def job = openshift.create(openshift.process(readFile(file:"job.yaml")))
-			//def pods = openshift.selector("job", "${NAME}-depcheck").related("pod")
-                	job.logs('-f')
-                	openshift.selector("job", "${NAME}-depcheck").delete()
-		}//if
-		else {
-			openshift.selector("job", "${NAME}-depcheck").delete()
-			def job = openshift.apply(openshift.process(readFile(file:"job.yaml")))
-                	job.logs('-f')
-		}//else
-              }//stage
-            }//withProject*/
             openshift.withProject("${PROJECT}-qa") {
                 stage('Build'){
                     if (!openshift.selector("bc", "${NAME}").exists()) {
@@ -68,27 +30,6 @@ timestamps{
                 }//stage
                 stage('Tagging Image'){
 		            openshift.tag("${NAME}:latest", "${REPOSITORY}/${NAME}:latest")
-                }//stage
-                stage('Deploy QA') {
-                    echo "Criando Deployment"
-                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-qa.yml"), "--param-file=template_environments_qa"))
-                    openshift.selector("dc", "${NAME}").rollout().latest()
-                    def dc = openshift.selector("dc", "${NAME}")
-                    dc.rollout().status()
-                }//stage
-                stage('Promote to HML'){
-                    //routeHost = sh(script: "kubectl get ingress nodejs -n nodejs-qa -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
-                    routeHost = openshift.raw("get route ${NAME} -o jsonpath='{ .spec.host }' --loglevel=4").out.trim()
-                    input message: "Promote to HML. Test deployment: http://${routeHost}. Approve?", id: "approval"
-                }
-            }//withProject
-            openshift.withProject("${PROJECT}-hml") {
-                stage('Deploy HML') {
-                    echo "Criando Deployment"
-                    openshift.apply(openshift.process(readFile(file:"${TEMPLATE}-hml.yml"), "--param-file=template_environments_hml"))
-                    openshift.selector("dc", "${NAME}").rollout().latest()
-                    def dc = openshift.selector("dc", "${NAME}")
-                    dc.rollout().status()
                 }//stage
             }//withProject
         }//withCluster
