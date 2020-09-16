@@ -10,7 +10,7 @@ spec:
         - args:
             - 'zap-api-scan.py'
             - '-t'
-            - '${URL}'
+            - "${URL}"
             - '-f'
             - 'openapi'
             - '-g'

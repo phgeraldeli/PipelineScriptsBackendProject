@@ -4,6 +4,7 @@ timestamps{
             //checkout([$class: 'GitSCM', branches: [[name: '*/openshift']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/cmotta2016/PipelineScriptsBackendProject.git']]])
             checkout scm
         }
+        /*
         stage('Compile'){
             sh 'npm set registry http://cicdtools.oracle.msdigital.pro:8081/repository/npm-group'
             sh 'npm install'
@@ -18,6 +19,7 @@ timestamps{
             def sonar = load 'sonar.groovy'
             sonar.codeQuality()
         }
+        */
         /*
         stage('Dependency Check'){
            sh 'oc create -f depcheck_job_scan.yaml'
@@ -42,6 +44,7 @@ timestamps{
               }//stage
             }//withProject*/
             openshift.withProject("${PROJECT}-qa") {
+                /*
                 stage('Build'){
                     if (!openshift.selector("bc", "${NAME}").exists()) {
                         echo "Criando build"
@@ -68,10 +71,11 @@ timestamps{
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
                 }//stage
+                */
                 stage('Security Test') {
                     echo "Iniciando security test"
                     routeHost = openshift.raw("get route ${NAME} -o jsonpath='{ .spec.host }' --loglevel=4").out.trim()
-                    echo "route = ${routeHost}"
+                    sh 'oc delete -f zap_job_scan.yaml'
                     sh 'oc create -f zap_job_scan.yaml'
                     sh 'sleep 10'
                     sh 'oc logs -f job/node-backend-v1-zap'
