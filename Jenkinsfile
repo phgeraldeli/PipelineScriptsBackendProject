@@ -18,15 +18,6 @@ timestamps{
             def sonar = load 'sonar.groovy'
             sonar.codeQuality()
         }
-        stage('Quality Gate'){
-            sleep(20)
-            timeout(activity: true, time: 20, unit: 'SECONDS') {
-                def qg = waitForQualityGate()
-                if (qg.status.toUpperCase() == 'ERROR') {
-                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                }
-            }
-        }
         /*
         stage('Dependency Check'){
            sh 'oc create -f depcheck_job_scan.yaml'
