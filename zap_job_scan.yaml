@@ -9,7 +9,7 @@ spec:
         - args:
             - 'zap-api-scan.py'
             - '-t'
-            - '@URL_ZAP@'
+            - '${URL}'
             - '-f'
             - 'openapi'
             - '-g'
@@ -18,7 +18,4 @@ spec:
             - 'security_report.html'
           image: "owasp/zap2docker-stable:2.9.0"
           name: node-backend-v1-zap
-          volumeMounts:
-            - mountPath: /src/zap/wrk/
-              name: zap-workspace
   backoffLimit: 3
