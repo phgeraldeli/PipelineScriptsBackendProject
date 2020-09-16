@@ -27,12 +27,13 @@ timestamps{
                 }
             }
         }
+        /*
         stage('Dependency Check'){
            sh 'oc create -f depcheck_job_scan.yaml'
            sh 'sleep 10'
            sh 'oc logs -f job/node-backend-v1-depcheck'
            sh 'oc delete -f depcheck_job_scan.yaml'
-        }
+        }*/
         openshift.withCluster() {
             /*openshift.withProject("cicd") {
               stage('Dependency Check'){
@@ -75,6 +76,13 @@ timestamps{
                     openshift.selector("dc", "${NAME}").rollout().latest()
                     def dc = openshift.selector("dc", "${NAME}")
                     dc.rollout().status()
+                }//stage
+                stage('Security Test') {
+                    echo "Iniciando security test"
+                    sh 'oc create -f zap_job_scan.yaml'
+                    sh 'sleep 10'
+                    sh 'oc logs -f job/node-backend-v1-zap'
+                    sh 'oc delete -f zap_job_scan.yaml'
                 }//stage
                 stage('Promote to HML'){
                     //routeHost = sh(script: "kubectl get ingress nodejs -n nodejs-qa -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
