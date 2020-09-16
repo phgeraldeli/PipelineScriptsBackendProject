@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - args:
-            - '@SCRIPT_NAME@'
+            - 'zap-api-scan.py'
             - '-t'
             - '@URL_ZAP@'
             - '-f'
