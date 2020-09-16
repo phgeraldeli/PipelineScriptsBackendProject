@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: node-backend-v1-zap
+spec:
+  template:
+    spec:
+      containers:
+        - args:
+            - '@SCRIPT_NAME@'
+            - '-t'
+            - '@URL_ZAP@'
+            - '-f'
+            - 'openapi'
+            - '-g'
+            - 'rules.conf'
+            - '-r'
+            - 'security_report.html'
+          image: "owasp/zap2docker-stable:2.9.0"
+          name: node-backend-v1-zap
+          volumeMounts:
+            - mountPath: /src/zap/wrk/
+              name: zap-workspace
+  backoffLimit: 3
