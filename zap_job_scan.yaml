@@ -5,6 +5,7 @@ metadata:
 spec:
   template:
     spec:
+      restartPolicy: Never
       containers:
         - args:
             - 'zap-api-scan.py'
