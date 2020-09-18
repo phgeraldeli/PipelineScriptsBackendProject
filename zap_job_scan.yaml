@@ -5,8 +5,6 @@ metadata:
 spec:
   template:
     spec:
-      securityContext:
-        runAsGroup: 5777
       volumes:
         - name: zap-wrk
           emptyDir: {}
@@ -18,10 +16,6 @@ spec:
             - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
             - '-f'
             - 'openapi'
-            - '-g'
-            - 'rules.conf'
-            - '-r'
-            - './zap/wrk/security_report.html'
           image: "owasp/zap2docker-stable:2.9.0"
           name: node-backend-v1-zap
           volumeMounts:
