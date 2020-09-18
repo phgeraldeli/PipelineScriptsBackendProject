@@ -7,7 +7,6 @@ spec:
     spec:
       securityContext:
         runAsGroup: 5777
-        fsGroup: 65533
       volumes:
         - name: zap-wrk
           emptyDir: {}
