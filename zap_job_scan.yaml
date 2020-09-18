@@ -10,7 +10,7 @@ spec:
         - args:
             - 'zap-api-scan.py'
             - '-t'
-            - "${URL_QA}"
+            - "@URL_QA@"
             - '-f'
             - 'openapi'
             - '-g'
@@ -19,9 +19,6 @@ spec:
             - 'security_report.html'
           image: "owasp/zap2docker-stable:2.9.0"
           name: node-backend-v1-zap
-          env:
-            - name: URL_QA
-              value: "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
           volumeMounts:
             - name: zap-wrk
               mountPath: /zap/wrk

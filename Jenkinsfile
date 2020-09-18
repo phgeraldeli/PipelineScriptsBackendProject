@@ -75,8 +75,9 @@ timestamps{
                 stage('Security Test') {
                     echo "Iniciando security test"
                     routeHost = openshift.raw("get route ${NAME} -o jsonpath='{ .spec.host }' --loglevel=4").out.trim()
-                    // def yaml = readFile "zap_job_scan.yaml"
-                    // yaml.replaceAll("@URL_QA@", "http://${routeHost}")
+                    def yaml = readFile "zap_job_scan.yaml"
+                    yaml.replaceAll("@URL_QA@", "http://${routeHost}")
+                    writeFile file: "zap_job_scan.yaml", text: yaml
                     sh 'oc create -f zap_job_scan.yaml'
                     sh 'sleep 10'
                     sh 'oc logs -f job/node-backend-v1-zap'
