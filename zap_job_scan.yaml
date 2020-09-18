@@ -7,8 +7,7 @@ spec:
     spec:
       volumes:
         - name: zap-wrk
-          persistentVolumeClaim:
-            claimName: zap-wrk
+          emptyDir: {}
       restartPolicy: Never
       containers:
         - args:
