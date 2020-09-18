@@ -11,7 +11,8 @@ spec:
       restartPolicy: Never
       containers:
         - args:
-            - '/bin/sleep 600'
+            - '/bin/sleep'
+            - '600'
 #            - 'zap-api-scan.py'
 #            - '-t'
 #            - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
