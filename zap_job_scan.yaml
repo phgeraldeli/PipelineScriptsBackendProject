@@ -22,7 +22,9 @@ spec:
             - 'security_report.html'
           image: "owasp/zap2docker-stable:2.9.0"
           name: node-backend-v1-zap
+          securityContext:
+            runAsGroup: 5777
           volumeMounts:
-            - mountPath: ./zap/wrk/:rw
+            - mountPath: ./zap/wrk
               name: zap-wrk
   backoffLimit: 3
