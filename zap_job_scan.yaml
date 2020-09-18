@@ -5,12 +5,16 @@ metadata:
 spec:
   template:
     spec:
+      volumes:
+        - name: zap-wrk
+          persistentVolumeClaim:
+            claimName: zap-wrk
       restartPolicy: Never
       containers:
         - args:
             - 'zap-api-scan.py'
             - '-t'
-            - "@URL_QA@"
+            - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
             - '-f'
             - 'openapi'
             - '-g'
@@ -20,9 +24,6 @@ spec:
           image: "owasp/zap2docker-stable:2.9.0"
           name: node-backend-v1-zap
           volumeMounts:
-            - name: zap-wrk
-              mountPath: /zap/wrk
-      volumes:
-        - name: zap-wrk
-          emptyDir: {}
+            - mountPath: ./zap/wrk
+              name: zap-wrk
   backoffLimit: 3
