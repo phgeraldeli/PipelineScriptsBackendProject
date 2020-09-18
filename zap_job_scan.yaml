@@ -23,6 +23,6 @@ spec:
           image: "owasp/zap2docker-stable:2.9.0"
           name: node-backend-v1-zap
           volumeMounts:
-            - mountPath: ./zap/wrk
+            - mountPath: ./zap/wrk/:rw
               name: zap-wrk
   backoffLimit: 3
