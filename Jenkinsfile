@@ -76,6 +76,7 @@ timestamps{
                     echo "Iniciando security test"
                     routeHost = openshift.raw("get route ${NAME} -o jsonpath='{ .spec.host }' --loglevel=4").out.trim()
                     sh 'oc create -f zap_job_scan.yaml'
+
                     sh 'sleep 10'
                     sh 'oc logs -f job/node-backend-v1-zap'
                     sh 'oc delete -f zap_job_scan.yaml'
