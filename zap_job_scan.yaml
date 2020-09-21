@@ -2,7 +2,6 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: node-backend-v1-zap
-  namespace: zap
 spec:
   template:
     spec:
