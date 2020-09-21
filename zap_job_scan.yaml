@@ -5,23 +5,23 @@ metadata:
 spec:
   template:
     spec:
+      securityContext:
+        runAsUser: 1000
       volumes:
         - name: zap-wrk
           emptyDir: {}
       restartPolicy: Never
       containers:
         - args:
-            - '/bin/sleep'
-            - '600'
-#            - 'zap-api-scan.py'
-#            - '-t'
-#            - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
-#            - '-f'
-#            - 'openapi'
-#            - '-g'
-#            - 'rules.conf'
-#            - '-r'
-#            - 'security_report.html'
+            - 'zap-api-scan.py'
+            - '-t'
+            - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
+            - '-f'
+            - 'openapi'
+            - '-g'
+            - 'rules.conf'
+            - '-r'
+            - 'security_report.html'
           image: "owasp/zap2docker-stable:2.9.0"
           name: node-backend-v1-zap
           volumeMounts:
