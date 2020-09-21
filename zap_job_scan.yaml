@@ -18,6 +18,7 @@ spec:
             - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
             - '-f'
             - 'openapi'
+            - '-I'
             - '-g'
             - 'rules.conf'
             - '-r'
