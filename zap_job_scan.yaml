@@ -23,8 +23,7 @@ spec:
             - 'rules.conf'
             - '-r'
             - 'security_report.html'
-          image: "owasp/zap2docker-weekly:latest"
-          imagePullPolicy: Always
+          image: "owasp/zap2docker-weekly:latesty"
           name: node-backend-v1-zap
           volumeMounts:
             - mountPath: /zap/wrk
