@@ -30,13 +30,18 @@ timestamps{
         openshift.withCluster() {
             openshift.withProject("cicd") {
                 def jobTemplate = readFile(file:'zap_job_scan.yaml')
-                if(!openshift.selector("job", "node-backend-v1-zap").exists()) {
-                    echo 'if'
-                    openshift.create(jobTemplate)
-                } else {
-                    echo 'else'
-                    openshift.delete(jobTemplate)
-                    openshift.create(jobTemplate)
+                openshift.delete(jobTemplate)
+                def jobCreated = openshift.create(jobTemplate)
+                def job = openshift.selector("job", "node-backend-v1-zap")
+                timeout(5) {
+                    job.untilEach(1) {
+                        return (it.related('pods').object().status.phase != "Pending")
+                    }
+                }
+                job.logs('-f')
+                def obj = job.related('pods').object()
+                if (obj.status.phase in ["Error", "Failed", "Cancelled"]) {
+                    error(obj.toString())
                 }
             }
             /*

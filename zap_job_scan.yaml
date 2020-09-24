@@ -23,7 +23,7 @@ spec:
             - 'rules.conf'
             - '-r'
             - 'security_report.html'
-          image: "owasp/zap2docker-stable:2.9.0"
+          image: "owasp/zap2docker-weekly:latest"
           name: node-backend-v1-zap
           volumeMounts:
             - mountPath: /zap/wrk
