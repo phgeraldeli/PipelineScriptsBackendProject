@@ -8,8 +8,11 @@ spec:
       securityContext:
         runAsUser: 1000
       volumes:
-        - name: zap-wrk
-          emptyDir: {}
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: pvc-cache-nodejs
+#        - name: zap-wrk
+#          emptyDir: {}
       restartPolicy: Never
       containers:
         - args:
@@ -29,5 +32,7 @@ spec:
           name: node-backend-v1-zap
           volumeMounts:
             - mountPath: /zap/wrk
-              name: zap-wrk
+              name: workspace
+#            - mountPath: /zap/wrk
+#              name: zap-wrk
   backoffLimit: 0
