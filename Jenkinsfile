@@ -5,10 +5,6 @@ timestamps{
             checkout scm
         }
         stage('Security Test') {
-            sh 'mkdir zap'
-            sh 'chmod 777 zap'
-            sh 'pwd'
-            sh 'ls -a'
             openshift.withCluster() {
                 openshift.withProject("cicd") {
                     def jobTemplate = readFile(file:'zap_job_scan.yaml')
