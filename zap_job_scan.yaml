@@ -25,13 +25,13 @@ spec:
 #            - 'openapi'
 #            - '-I'
 #            - '-g'
-#            - 'TestePhilippe/OpenshiftJavascriptBackend/rules.conf'
+#            - 'rules.conf'
 #            - '-r'
-#            - 'TestePhilippe/OpenshiftJavascriptBackend/security_report.html'
+#            - 'security_report.html'
           image: "owasp/zap2docker-weekly:latest"
           name: node-backend-v1-zap
           volumeMounts:
-            - mountPath: /zap/wrk
+            - mountPath: /zap/wrk/TestePhilippe/OpenshiftJavascriptBackend
               name: workspace
 #            - mountPath: /zap/wrk
 #              name: zap-wrk
