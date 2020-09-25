@@ -16,16 +16,18 @@ spec:
       restartPolicy: Never
       containers:
         - args:
-            - 'zap-api-scan.py'
-            - '-t'
-            - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
-            - '-f'
-            - 'openapi'
-            - '-I'
-            - '-g'
-            - 'TestePhilippe/OpenshiftJavascriptBackend/rules.conf'
-            - '-r'
-            - 'TestePhilippe/OpenshiftJavascriptBackend/security_report.html'
+            - '/bin/sleep'
+            - '600'
+#            - 'zap-api-scan.py'
+#            - '-t'
+#            - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
+#            - '-f'
+#            - 'openapi'
+#            - '-I'
+#            - '-g'
+#            - 'TestePhilippe/OpenshiftJavascriptBackend/rules.conf'
+#            - '-r'
+#            - 'TestePhilippe/OpenshiftJavascriptBackend/security_report.html'
           image: "owasp/zap2docker-weekly:latest"
           name: node-backend-v1-zap
           volumeMounts:
