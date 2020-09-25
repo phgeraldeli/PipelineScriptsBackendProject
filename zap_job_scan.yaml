@@ -23,7 +23,9 @@ spec:
             - 'rules.conf'
             - '-r'
             - 'security_report.html'
-            - 'sleep 600'
+            - '&&'
+            - '/bin/sleep'
+            - '600'
           image: "owasp/zap2docker-weekly:latest"
           name: node-backend-v1-zap
           volumeMounts:
