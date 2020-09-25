@@ -31,7 +31,7 @@ spec:
           image: "owasp/zap2docker-weekly:latest"
           name: node-backend-v1-zap
           volumeMounts:
-            - mountPath: /zap/wrk/TestePhilippe/OpenshiftJavascriptBackend
+            - mountPath: /zap/wrk/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend
               name: workspace
 #            - mountPath: /zap/wrk
 #              name: zap-wrk
