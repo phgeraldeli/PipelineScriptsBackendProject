@@ -20,7 +20,7 @@ spec:
             - '-t'
             - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
             - '-f'
-            - 'TestePhilippe/OpenshiftJavascriptBackend/openapi'
+            - 'openapi'
             - '-I'
             - '-g'
             - 'TestePhilippe/OpenshiftJavascriptBackend/rules.conf'
