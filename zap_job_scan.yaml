@@ -18,12 +18,12 @@ spec:
         - args:
             - 'zap-api-scan.py'
             - '-t'
-            - "/zap/wrk/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
+            - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
             - '-f'
             - 'openapi'
             - '-I'
             - '-g'
-            - 'rules.conf'
+            - '/zap/wrk/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/rules.conf'
             - '-r'
             - '/zap/wrk/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/security_report.html'
           image: "owasp/zap2docker-weekly:latest"
