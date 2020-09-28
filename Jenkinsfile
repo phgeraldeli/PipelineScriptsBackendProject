@@ -5,6 +5,8 @@ timestamps{
             checkout scm
         }
         stage('Security Test') {
+            sh 'mkdir zap-output'
+            sh 'chmod 777 zap-output'
             openshift.withCluster() {
                 openshift.withProject("cicd") {
                     def jobTemplate = readFile(file:'zap_job_scan.yaml')
@@ -23,6 +25,11 @@ timestamps{
                     }
                 }
             }//withCluster
+
+            jenkinsContext.publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                                                    reportDir: "", reportFiles: 'zap-output/security_report.html',
+                                                    reportName: 'Vulnerability Report', reportTitles: ''])
+
         }
     }//node
 }//timestamps
