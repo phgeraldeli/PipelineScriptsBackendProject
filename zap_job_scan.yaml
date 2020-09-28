@@ -18,7 +18,6 @@ spec:
         - args:
             - '/bin/sleep'
             - '600'
-#
 #            - 'zap-api-scan.py'
 #            - '-t'
 #            - "http://node-backend-v1-node-backend-qa.apps.openshift.oracle.msdigital.pro"
@@ -26,13 +25,13 @@ spec:
 #            - 'openapi'
 #            - '-I'
 #            - '-g'
-#            - '/zap/wrk/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/rules.conf'
+#            - 'TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/rules.conf'
 #            - '-r'
-#            - '/zap/wrk/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/security_report.html'
+#            - 'TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend/security_report.html'
           image: "owasp/zap2docker-weekly:latest"
           name: node-backend-v1-zap
           volumeMounts:
-            - mountPath: /zap/wrk/TestePhilippe/OpenshiftJavascriptBackend/TestePhilippe/OpenshiftJavascriptBackend
+            - mountPath: /zap/wrk
               name: workspace
 #            - mountPath: /zap/wrk
 #              name: zap-wrk
