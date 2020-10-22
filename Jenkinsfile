@@ -27,34 +27,26 @@ timestamps{
                 }
             }
         }
-        stage('Dependency Check'){
-           sh 'oc create -f depcheck_job_scan.yaml'
-           sh 'sleep 10'
-           sh 'oc logs -f job/node-backend-v1-depcheck'
-           sh 'oc delete -f depcheck_job_scan.yaml'
-        }
         openshift.withCluster() {
-            /*openshift.withProject("cicd") {
-              stage('Dependency Check'){
-		if (!openshift.selector("job", "${NAME}-depcheck").exists()) {      
-                	def job = openshift.create(openshift.process(readFile(file:"job.yaml")))
-			//def pods = openshift.selector("job", "${NAME}-depcheck").related("pod")
-                	job.logs('-f')
-                	openshift.selector("job", "${NAME}-depcheck").delete()
-		}//if
-		else {
-			openshift.selector("job", "${NAME}-depcheck").delete()
-			def job = openshift.apply(openshift.process(readFile(file:"job.yaml")))
-                	job.logs('-f')
-		}//else
-              }//stage
-            }//withProject*/
             openshift.withProject("${PROJECT}-qa") {
                 stage('Build'){
                     if (!openshift.selector("bc", "${NAME}").exists()) {
                         echo "Criando build"
-                        //def nb = openshift.newBuild(".", "--strategy=source", "--image-stream=${IMAGE_BUILDER}", "--allow-missing-images", "--name=${NAME}", "-l app=${LABEL}")
-                        def nb = openshift.newBuild("--name=${NAME}", "--image-stream=${IMAGE_BUILDER}", "--binary", "-l app=${NAME}", "--build-config-map npmrc:.")
+                        final String resource = jenkinsContext.libraryResource "npmrc-nexus.yml"
+
+                        try {
+                            jenkinsContext.openshift.apply(jenkinsContext.openshift.process(resource))
+                        } catch(Exception e) {
+                            jenkinsContext.println("[DEBUG] Config-map npmrc-nexus.yml já existe.")
+                        } finally {
+                            buildConfigMaps = "npmrc-nexus:." + (buildConfigMaps? ",${buildConfigMaps}" : "")
+                        }
+
+                        def nb = openshift.newBuild("--name=${NAME}",
+                                                    "--image-stream=${IMAGE_BUILDER}",
+                                                    "--binary", "-l app=${NAME}",
+                                                    "--build-config-map=${buildConfigMaps}")
+
                         def buildSelector = nb.narrow("bc").related("builds")
                         buildSelector.logs('-f')
                         def build = openshift.selector("bc", "${NAME}").startBuild("--from-archive=teste-build.tgz")
@@ -62,7 +54,8 @@ timestamps{
                     }//if
                     else {
                         echo "Build já existe. Iniciando build"
-                        def build = openshift.selector("bc", "${NAME}").startBuild("--from-archive=teste-build.tgz")
+                        def build = openshift.selector("bc", "${NAME}")
+                                        .startBuild("--from-archive=teste-build.tgz")
                         build.logs('-f')
                     }//else
                 }//stage
