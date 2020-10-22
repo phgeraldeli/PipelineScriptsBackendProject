@@ -14,17 +14,19 @@
                 openshift.withProject("${PROJECT}-qa") {
                     String buildConfigMaps;
                     stage('Build'){
+                        try {
+                            final String resource = libraryResource "global/release/templates/npmrc-nexus"
+                            writeFile encoding: 'UTF-8', file: 'npmrc-nexus', text: resource
+                            openshift.apply(openshift.raw("create configmap npmrc-nexus --from-file=.npmrc=npmrc-nexus --output=yaml"))
+                        } catch(Exception e) {
+                            println e
+                            println("[DEBUG] Config-map npmrc-nexus já existe.")
+                        }
+
                         if (!openshift.selector("bc", "${NAME}").exists()) {
                             echo "Criando build"
-                            final String resource = readFile "npmrc-nexus.yml"
 
-                            try {
-                                openshift.apply(openshift.process(resource))
-                            } catch(Exception e) {
-                                println(e)
-                            } finally {
-                                buildConfigMaps = "npmrc-nexus:." + (buildConfigMaps? ",${buildConfigMaps}" : "")
-                            }
+                            buildConfigMaps = "npmrc-nexus:." + (buildConfigMaps? ",${buildConfigMaps}" : "")
 
                             def nb = openshift.newBuild("--name=${NAME}",
                                                         "--image-stream=${IMAGE_BUILDER}",
