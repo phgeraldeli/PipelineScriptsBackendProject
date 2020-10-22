@@ -1,5 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
+metadata:
+  name: npmrc-nexus
+  namespace: node-backend-qa
 data:
   .npmrc: |
     registry=https://oinexus.intranet/repository/npm-group/
