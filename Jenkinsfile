@@ -12,7 +12,7 @@
             }
             openshift.withCluster() {
                 openshift.withProject("${PROJECT}-qa") {
-                    def variable =
+                    String buildConfigMaps;
                     stage('Build'){
                         if (!openshift.selector("bc", "${NAME}").exists()) {
                             echo "Criando build"
@@ -21,7 +21,7 @@
                             try {
                                 openshift.apply(openshift.process(resource))
                             } catch(Exception e) {
-                                println("[DEBUG] Config-map npmrc-nexus.yml já existe.")
+                                println(e)
                             } finally {
                                 buildConfigMaps = "npmrc-nexus:." + (buildConfigMaps? ",${buildConfigMaps}" : "")
                             }
