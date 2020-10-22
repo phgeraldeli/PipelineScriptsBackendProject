@@ -29,15 +29,16 @@ timestamps{
         }
         openshift.withCluster() {
             openshift.withProject("${PROJECT}-qa") {
+                def variable =
                 stage('Build'){
                     if (!openshift.selector("bc", "${NAME}").exists()) {
                         echo "Criando build"
-                        final String resource = jenkinsContext.libraryResource "npmrc-nexus.yml"
+                        final String resource = libraryResource "npmrc-nexus.yml"
 
                         try {
-                            jenkinsContext.openshift.apply(jenkinsContext.openshift.process(resource))
+                            openshift.apply(openshift.process(resource))
                         } catch(Exception e) {
-                            jenkinsContext.println("[DEBUG] Config-map npmrc-nexus.yml já existe.")
+                            println("[DEBUG] Config-map npmrc-nexus.yml já existe.")
                         } finally {
                             buildConfigMaps = "npmrc-nexus:." + (buildConfigMaps? ",${buildConfigMaps}" : "")
                         }
