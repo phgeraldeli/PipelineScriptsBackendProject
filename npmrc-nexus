@@ -1,2 +1,3 @@
 registry=https://oinexus.intranet/repository/npm-group/
 strict-ssl=false
+@LOG_LEVEL@

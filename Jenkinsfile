@@ -14,13 +14,16 @@
                 openshift.withProject("${PROJECT}-qa") {
                     String buildConfigMaps;
                     stage('Build'){
-                        try {
-                            final String resource = libraryResource "global/release/templates/npmrc-nexus"
+                        if (!openshift.selector("configmap", "npmrc-nexus").exists()) {
+                            String resource = readFile "npmrc-nexus"
+
+                            resource = resource.replace("@LOG_LEVEL@", "loglevel=${TOOL_LOGLEVEL}")
+                            
                             writeFile encoding: 'UTF-8', file: 'npmrc-nexus', text: resource
-                            openshift.apply(openshift.raw("create configmap npmrc-nexus --from-file=.npmrc=npmrc-nexus --output=yaml"))
-                        } catch(Exception e) {
-                            println e
-                            println("[DEBUG] Config-map npmrc-nexus já existe.")
+                            openshift.raw("create configmap npmrc-nexus --from-file=.npmrc=npmrc-nexus")
+                            println("[DEBUG] Config-map npmrc-nexus criado.")
+                        } else {
+                            println("[DEBUG] Config-map npmrc-nexus j�� existe.")
                         }
 
                         if (!openshift.selector("bc", "${NAME}").exists()) {
