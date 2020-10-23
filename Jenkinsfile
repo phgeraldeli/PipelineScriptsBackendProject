@@ -14,16 +14,22 @@
                 openshift.withProject("${PROJECT}-qa") {
                     String buildConfigMaps;
                     stage('Build'){
-                        if (!openshift.selector("configmap", "npmrc-nexus").exists()) {
-                            String resource = readFile "npmrc-nexus"
-
-                            resource = resource.replace("@LOG_LEVEL@", "loglevel=${TOOL_LOGLEVEL}")
+                        if ( isJavascript ) {
+                            String templateFile = "npmrc.file"
+                            String cfgMapFile = ".npmrc"
+                            String cfgMapName = "npmrc-nexus"
                             
-                            writeFile encoding: 'UTF-8', file: 'npmrc-nexus', text: resource
-                            openshift.raw("create configmap npmrc-nexus --from-file=.npmrc=npmrc-nexus")
-                            println("[DEBUG] Config-map npmrc-nexus criado.")
-                        } else {
-                            println("[DEBUG] Config-map npmrc-nexus j�� existe.")
+                            println("[DEBUG] Applying ConfigMap '${cfgMapName}'...")
+                            String logLevel = $TOOL_LOGLEVEL
+                            String template = libraryResource "global/release/templates/${templateFile}"
+                            template = template.replace( "@LOG_LEVEL@", logLevel ? "loglevel=${logLevel}" : "" )
+                            String tempFilePath = sh(script: "mktemp --dry-run", returnStdout: true).trim()
+                            writeFile encoding: 'UTF-8', file: tempFilePath, text: template
+                            openshift.apply(openshift.raw("create configmap ${cfgMapName} --from-file=${cfgMapFile}=${tempFilePath} --dry-run --output=yaml").actions[0].out)
+                            sh("rm -f ${tempFilePath}")
+                            
+                            
+                            buildConfigMaps = "npmrc-nexus:." + ( buildConfigMaps ? ",${buildConfigMaps}" : "" )
                         }
 
                         if (!openshift.selector("bc", "${NAME}").exists()) {
