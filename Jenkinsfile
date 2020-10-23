@@ -13,6 +13,8 @@
             openshift.withCluster() {
                 openshift.withProject("${PROJECT}-qa") {
                     String buildConfigMaps;
+                    boolean isJavascript = true
+
                     stage('Build'){
                         if ( isJavascript ) {
                             String templateFile = "npmrc.file"
