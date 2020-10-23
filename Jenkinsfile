@@ -22,8 +22,8 @@
                             String cfgMapName = "npmrc-nexus"
                             
                             println("[DEBUG] Applying ConfigMap '${cfgMapName}'...")
-                            String logLevel = $TOOL_LOGLEVEL
-                            String template = libraryResource "global/release/templates/${templateFile}"
+                            String logLevel = "${TOOL_LOGLEVEL}"
+                            String template = readFile "${templateFile}"
                             template = template.replace( "@LOG_LEVEL@", logLevel ? "loglevel=${logLevel}" : "" )
                             String tempFilePath = sh(script: "mktemp --dry-run", returnStdout: true).trim()
                             writeFile encoding: 'UTF-8', file: tempFilePath, text: template
