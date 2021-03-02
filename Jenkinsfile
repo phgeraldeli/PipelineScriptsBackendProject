@@ -21,6 +21,7 @@ timestamps {
                 sh 'chmod +x ./kubectl'
                 sh './kubectl cluster-info'
                 sh "./kubectl apply -f deployment.yml"
+                sh './kubectl rollout status deployment.apps/joicehml'
             }
         }
         // stage('Deploy QA'){
