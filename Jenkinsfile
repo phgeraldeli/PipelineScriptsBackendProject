@@ -6,7 +6,7 @@ timestamps {
         stage('Build/Push Image to ECR'){
             // sh '{ set +x; } 2>/dev/null; sudo $(aws ecr get-login --profile devops --region us-east-1)'
             withAWS(region: 'us-east-1', credentials: 'aws-devops-test') {
-               sh "aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 731735707548.dkr.ecr.us-east-1.amazonaws.com"
+               sh "aws ecr get-login-password | sudo docker login --username AWS --password-stdin 731735707548.dkr.ecr.us-east-1.amazonaws.com"
             }
             sh "sudo docker build -t 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER} ." // Utilizar --force-rm e --pull?
             sh "sudo docker tag 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER} 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
@@ -16,7 +16,7 @@ timestamps {
         }
         stage('List Docker images on ECR') {
             withAWS(region: 'us-east-1', credentials: 'aws-devops-test') {
-                sh "aws ecr describe-images --repository-name pocjoicedevops --profile devops --region us-east-1"
+                sh "aws ecr describe-images --repository-name pocjoicedevops"
             }
         }
         // stage('Deploy QA'){
