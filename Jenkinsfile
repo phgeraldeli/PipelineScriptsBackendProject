@@ -5,7 +5,9 @@ timestamps {
         }
         stage('Build/Push Image to ECR'){
             // sh '{ set +x; } 2>/dev/null; sudo $(aws ecr get-login --profile devops --region us-east-1)'
-            sh "aws ecr get-login-password --region us-east-1 --profile devops | sudo docker login --username AWS --password-stdin 731735707548.dkr.ecr.us-east-1.amazonaws.com"
+            withAWS(region: 'us-east-1', credentials: 'aws-devops-test') {
+               sh "aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 731735707548.dkr.ecr.us-east-1.amazonaws.com"
+            }
             sh "sudo docker build -t 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER} ." // Utilizar --force-rm e --pull?
             sh "sudo docker tag 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER} 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
             sh "sudo docker push 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
@@ -13,7 +15,9 @@ timestamps {
             sh "sudo docker rmi 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER}"
         }
         stage('List Docker images on ECR') {
-            sh "aws ecr describe-images --repository-name pocjoicedevops --profile devops --region us-east-1"
+            withAWS(region: 'us-east-1', credentials: 'aws-devops-test') {
+                sh "aws ecr describe-images --repository-name pocjoicedevops --profile devops --region us-east-1"
+            }
         }
         // stage('Deploy QA'){
         //     sh 'kubectl config set-context nodejs-qa --namespace=nodejs-qa && kubectl config use-context nodejs-qa'
