@@ -13,9 +13,11 @@ timestamps {
             // def token = sh(script: "aws ecr get-login-password --region us-east-1 --profile devops", returnStdout: true).trim()
             // def command = sh(script: "aws ecr get-login --profile devops --region us-east-1", returnStdout: true).trim()
             sh '{ set +x; } 2>/dev/null; sudo $(aws ecr get-login --profile devops --region us-east-1)'
-            sh "sudo docker build -t pocjoicedevops ."
-            sh "sudo docker tag pocjoicedevops:latest 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
+            sh "sudo docker build -t 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER} ."
+            sh "sudo docker tag 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER} 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
             sh "sudo docker push 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
+            sh "sudo docker push 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER}"
+            sh "sudo docker rmi 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER}"
         }
         stage('List Docker images on ECR') {
             sh "aws ecr describe-images --repository-name pocjoicedevops --profile devops --region us-east-1"
