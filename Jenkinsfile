@@ -10,8 +10,8 @@ timestamps {
             sh 'npm test'
         }
         stage('Push Image to ECR'){
-            def token = sh(script: "aws ecr get-login-password --region us-east-1 --profile devops", returnStdout: true).trim()
-            sh "docker login --username AWS --password ${token} 731735707548.dkr.ecr.us-east-1.amazonaws.com"
+            // def token = sh(script: "aws ecr get-login-password --region us-east-1 --profile devops", returnStdout: true).trim()
+            sh "aws ecr get-authorization-token --region us-east-1 --profile devops | docker login --username AWS --password-stdin 731735707548.dkr.ecr.us-east-1.amazonaws.com"
             sh "docker build -t pocjoicedevops ."
             sh "docker tag pocjoicedevops:latest 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
             sh "docker push 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
