@@ -14,9 +14,13 @@ timestamps {
             sh "sudo docker push 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER}"
             sh "sudo docker rmi 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER}"
         }
-        stage('List Docker images on ECR') {
+        stage('Deploy HML') {
             withAWS(region: 'us-east-1', credentials: 'aws-devops-test') {
-                sh "aws ecr describe-images --repository-name pocjoicedevops"
+                sh "aws eks update-kubeconfig --name POCJoiceDevOpsEKS"
+                sh 'curl -o kubectl http://dadhx05.interno:8081/repository/jenkins-dependencies/kubectl_v1.18'
+                sh 'chmod +x ./kubectl'
+                sh './kubectl cluster-info'
+                sh "./kubectl apply -f deployment.yml"
             }
         }
         // stage('Deploy QA'){

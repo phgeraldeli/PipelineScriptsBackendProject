@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ labels:
+   app: joicehml
+   environment: hml
+ name: joicehml
+ namespace: joicehml
+# annotations:
+#   template.alpha.openshift.io/wait-for-ready: 'true'
+spec:
+ replicas: 1
+ selector:
+  matchLabels:
+   app: joicehml
+   environment: hml
+ template:
+  metadata:
+   labels:
+    app: joicehml
+    environment: hml
+  spec:
+#   imagePullSecrets:
+#    - name: privregcred
+   containers:
+    - name: joicehml
+      image: 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest
+      resources:
+        limits:
+          cpu: '1'
+          memory: 1Gi
+        requests:
+          cpu: 250m
+          memory: 256Mi
+      ports:
+       - containerPort: 3000
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 3000
+          scheme: HTTP
+        initialDelaySeconds: 10
+        timeoutSeconds: 2
+        periodSeconds: 10
+        successThreshold: 1
+        failureThreshold: 3
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 3000
+          scheme: HTTP
+        initialDelaySeconds: 30
+        timeoutSeconds: 2
+        periodSeconds: 10
+        successThreshold: 1
+        failureThreshold: 3
