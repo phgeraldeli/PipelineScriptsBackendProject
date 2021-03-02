@@ -11,8 +11,8 @@ timestamps {
         }
         stage('Push Image to ECR'){
             // def token = sh(script: "aws ecr get-login-password --region us-east-1 --profile devops", returnStdout: true).trim()
-            def token = sh(script: """aws ecr get-authorization-token --region us-east-1 --profile devops | grep -oPs -m1 'authorizationToken("[^"]+){2}' | cut -d'"' -f3""", returnStdout: true).trim()
-            sh """docker login --username AWS -p ${token} 731735707548.dkr.ecr.us-east-1.amazonaws.com"""
+            // def command = sh(script: "aws ecr get-login --profile devops --region us-east-1", returnStdout: true).trim()
+            sh "$(aws ecr get-login --profile devops --region us-east-1)"
             sh "docker build -t pocjoicedevops ."
             sh "docker tag pocjoicedevops:latest 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
             sh "docker push 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
