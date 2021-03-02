@@ -21,6 +21,7 @@ timestamps {
                 sh 'chmod +x ./kubectl'
                 sh './kubectl cluster-info'
                 sh "./kubectl apply -f deployment.yml"
+                sh "./kubectl set image deployment/joiceqa joiceqa=731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER} --record"
                 sh './kubectl rollout status deployment.apps/joicehml'
             }
         }

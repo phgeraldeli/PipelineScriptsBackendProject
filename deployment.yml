@@ -2,29 +2,29 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
  labels:
-   app: joicehml
-   environment: hml
- name: joicehml
- namespace: joicehml
+   app: joiceqa
+   environment: qa
+ name: joiceqa
+ namespace: joiceqa
 # annotations:
 #   template.alpha.openshift.io/wait-for-ready: 'true'
 spec:
  replicas: 1
  selector:
   matchLabels:
-   app: joicehml
-   environment: hml
+   app: joiceqa
+   environment: qa
  template:
   metadata:
    labels:
-    app: joicehml
-    environment: hml
+    app: joiceqa
+    environment: qa
   spec:
 #   imagePullSecrets:
 #    - name: privregcred
    containers:
-    - name: joicehml
-      image: 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest
+    - name: joiceqa
+      image: " "
       resources:
         limits:
           cpu: '1'
