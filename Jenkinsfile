@@ -12,13 +12,13 @@ timestamps {
         stage('Push Image to ECR'){
             // def token = sh(script: "aws ecr get-login-password --region us-east-1 --profile devops", returnStdout: true).trim()
             // def command = sh(script: "aws ecr get-login --profile devops --region us-east-1", returnStdout: true).trim()
-            sh '$(aws ecr get-login --profile devops --region us-east-1)'
+            sh '{ set +x; } 2>/dev/null; $(aws ecr get-login --profile devops --region us-east-1)'
             sh "docker build -t pocjoicedevops ."
             sh "docker tag pocjoicedevops:latest 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
             sh "docker push 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
         }
         stage('List Docker images on ECR') {
-            sh "aws ecr describe-images --repository-name pocjoicedevops"
+            sh "aws ecr describe-images --repository-name pocjoicedevops --profile devops --region us-east-1"
         }
         // stage('Deploy QA'){
         //     sh 'kubectl config set-context nodejs-qa --namespace=nodejs-qa && kubectl config use-context nodejs-qa'
