@@ -2,28 +2,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
  labels:
-   app: joiceqa
-   environment: qa
- name: joiceqa
- namespace: joiceqa
-# annotations:
-#   template.alpha.openshift.io/wait-for-ready: 'true'
+   app: "@REPLACE_APP@"
+   environment: "@REPLACE_ENV@"
+ name: "@REPLACE_APP@"
+ namespace: "@REPLACE_APP@"
 spec:
  replicas: 1
  selector:
   matchLabels:
-   app: joiceqa
-   environment: qa
+   app: "@REPLACE_APP@"
+   environment: "@REPLACE_ENV@"
  template:
   metadata:
    labels:
-    app: joiceqa
-    environment: qa
+    app: "@REPLACE_APP@"
+    environment: "@REPLACE_ENV@"
   spec:
 #   imagePullSecrets:
 #    - name: privregcred
    containers:
-    - name: joiceqa
+    - name: "@REPLACE_APP@"
       image: " "
       resources:
         limits:
