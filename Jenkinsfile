@@ -1,66 +1,54 @@
-timestamps {
-    node('pocjoice') {
-        stage('Checkout'){
+timestamps { script {
+    node('pocjoice') { // ALTERAR NODE SE NECESSARIO
+        String VAR_REGION  = 'us-east-1'
+        String VAR_CRED    = 'aws-devops-test'
+        String VAR_ECR     = '731735707548.dkr.ecr.us-east-1.amazonaws.com'
+        String VAR_IMAGE   = 'pocjoicedevops'
+        String VAR_CLUSTER = 'POCJoiceDevOpsEKS'
+        stage('Checkout') {
             checkout scm
         }
-        stage('Build/Push Image to ECR'){
-            // sh '{ set +x; } 2>/dev/null; sudo $(aws ecr get-login --profile devops --region us-east-1)'
-            withAWS(region: 'us-east-1', credentials: 'aws-devops-test') {
-               sh "aws ecr get-login-password | sudo docker login --username AWS --password-stdin 731735707548.dkr.ecr.us-east-1.amazonaws.com"
+        stage('Build/Push Image to ECR') {
+            withAWS(region: "${VAR_REGION}", credentials: "${VAR_CRED}") {
+               sh "aws ecr get-login-password | sudo docker login --username AWS --password-stdin ${VAR_ECR}"
             }
-            sh "sudo docker build -t 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER} ." // Utilizar --force-rm e --pull?
-            sh "sudo docker tag 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER} 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
-            sh "sudo docker push 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest"
-            sh "sudo docker push 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER}"
-            sh "sudo docker rmi 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:latest 731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER}"
+            sh "sudo docker build -t ${VAR_ECR}/${VAR_IMAGE}:${BUILD_NUMBER} ." // --force-rm --pull
+            sh "sudo docker tag ${VAR_ECR}/${VAR_IMAGE}:${BUILD_NUMBER} ${VAR_ECR}/${VAR_IMAGE}:latest"
+            sh "sudo docker push ${VAR_ECR}/${VAR_IMAGE}:latest"
+            sh "sudo docker push ${VAR_ECR}/${VAR_IMAGE}:${BUILD_NUMBER}"
+            sh "sudo docker rmi ${VAR_ECR}/${VAR_IMAGE}:latest ${VAR_ECR}/${VAR_IMAGE}:${BUILD_NUMBER}"
         }
-        stage('Deploy HML') {
-            withAWS(region: 'us-east-1', credentials: 'aws-devops-test') {
-                sh "aws eks update-kubeconfig --name POCJoiceDevOpsEKS"
+        stage('Deploy QA') {
+            String VAR_YML = 'deployment.yml'
+            String VAR_APP = 'joiceqa'
+            String VAR_ENV = 'qa'
+            withAWS(region: "${VAR_REGION}", credentials: "${VAR_CRED}") {
+                sh "aws eks update-kubeconfig --name ${VAR_CLUSTER}"
+                // FAZER DOWNLOAD DO KUBECTL
                 sh 'curl -o kubectl http://dadhx05.interno:8081/repository/jenkins-dependencies/kubectl_v1.18'
                 sh 'chmod +x ./kubectl'
+                // EXECUTAR KUBECTL DA PASTA LOCAL
                 sh './kubectl cluster-info'
-                sh "./kubectl apply -f deployment.yml"
-                sh "./kubectl set image deployment/joiceqa joiceqa=731735707548.dkr.ecr.us-east-1.amazonaws.com/pocjoicedevops:${BUILD_NUMBER} --record -n joiceqa"
-                sh './kubectl rollout status deployment.apps/joiceqa -n joiceqa'
+                sh """sed "s/@REPLACE_APP@/${VAR_APP}/g;s/@REPLACE_ENV@/${VAR_ENV}/g" ${VAR_YML} | ./kubectl apply -f -"""
+                sh "./kubectl set image deployment/${VAR_APP} ${VAR_APP}=${VAR_ECR}/${VAR_IMAGE}:${BUILD_NUMBER} --record -n ${VAR_APP}"
+                sh "./kubectl rollout status deployment.apps/${VAR_APP} -n ${VAR_APP}"
             }
         }
-        // stage('Deploy QA'){
-        //     sh 'kubectl config set-context nodejs-qa --namespace=nodejs-qa && kubectl config use-context nodejs-qa'
-        //     def deployment = sh(script: "kubectl get deployment nodejs -o jsonpath='{ .metadata.name }' --ignore-not-found", returnStdout: true).trim()
-        //     if (deployment == "nodejs") {
-        //         sh 'kubectl set image deployment/nodejs nodejs=myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER} --record'
-        //     }
-        //     else {
-        //         sh 'kubectl create -f aks-nodejs.yaml --validate=false -l env!=hml'
-        //         sh 'kubectl set image deployment/nodejs nodejs=myproject54352edd.azurecr.io/node-app:${BUILD_NUMBER} --record'
-        //     }
-            //sh 'kubectl wait --for=condition=Ready deployment/nodejs -n nodejs-qa'
-        //     sh 'kubectl rollout status deployment.apps/nodejs'
-        // }
-        /*stage('Promote to HML'){
-            //routeHost = sh(script: "kubectl get ingress nodejs -n nodejs-qa -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
-            input message: "Promote to HML. Approve?", id: "approval"
-        }*/
-        // stage('Test Deployment'){
-        //     routeHost = sh(script: "kubectl get ingress nodejs -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
-        //     input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
-        // }
-        /*stage('Deploy HML'){
-            def deployment = sh(script: "kubectl get deployment nodejs -n nodejs-hml -o jsonpath='{ .metadata.name }' --ignore-not-found", returnStdout: true).trim()
-            if (deployment == "nodejs") {
-                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record -n nodejs-hml'
+        stage('Deploy HML') {
+            String VAR_YML = 'deployment.yml'
+            String VAR_APP = 'joicehml'
+            String VAR_ENV = 'hml'
+            withAWS(region: VAR_REGION, credentials: VAR_CRED) {
+                sh "aws eks update-kubeconfig --name ${VAR_CLUSTER}"
+                // FAZER DOWNLOAD DO KUBECTL
+                //sh 'curl -o kubectl http://dadhx05.interno:8081/repository/jenkins-dependencies/kubectl_v1.18'
+                //sh 'chmod +x ./kubectl'
+                // EXECUTAR KUBECTL DA PASTA LOCAL
+                sh './kubectl cluster-info'
+                sh """sed "s/@REPLACE_APP@/${VAR_APP}/g;s/@REPLACE_ENV@/${VAR_ENV}/g" ${VAR_YML} | ./kubectl apply -f -"""
+                sh "./kubectl set image deployment/${VAR_APP} ${VAR_APP}=${VAR_ECR}/${VAR_IMAGE}:${BUILD_NUMBER} --record -n ${VAR_APP}"
+                sh "./kubectl rollout status deployment.apps/${VAR_APP} -n ${VAR_APP}"
             }
-            else {
-                sh "kubectl create -f aks-nodejs.yaml -n nodejs-hml --validate=false --dry-run -o yaml | sed 's/qa/hml/g' | kubectl apply --validate=false -f -"
-                sh 'kubectl set image deployment/nodejs nodejs=cmotta2016.azurecr.io/node-app:${BUILD_NUMBER} --record -n nodejs-hml'
-            }
-            //sh 'kubectl wait --for=condition=Available deployment/nodejs -n nodejs --timeout=90s'
-            sh 'kubectl rollout status deployment.apps/nodejs -n nodejs-hml'
         }
-        stage('Test Deployment'){
-            routeHost = sh(script: "kubectl get ingress nodejs -n nodejs-qa -o jsonpath='{ .spec.rules[0].host }'", returnStdout: true).trim()
-            input message: "Test deployment: http://${routeHost}. Approve?", id: "approval"
-        }*/
     }
-}
+} }

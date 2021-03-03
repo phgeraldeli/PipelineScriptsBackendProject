@@ -22,7 +22,7 @@ spec:
 #    - name: privregcred
    containers:
     - name: "@REPLACE_APP@"
-      image: " "
+      image: "@REPLACE_IMG@"
       resources:
         limits:
           cpu: '1'
