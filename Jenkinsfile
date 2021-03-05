@@ -30,8 +30,8 @@ timestamps { script {
                           text: readFile(file: VAR_JSON).replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
                 )
                 sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp.json"
-                int desiredCount = sh("aws ecs describe-services --services ${VAR_SERVICE} --cluster ${VAR_CLUSTER} | grep -m1 desiredCount | tr -dc [:digit:]", returnStdout: true)
-                int revision = sh("aws ecs describe-task-definition --task-definition ${TASK_NAME} | grep revision | tr -dc [:digit:]", returnStdout: true)
+                int desiredCount = sh(script: "aws ecs describe-services --services ${VAR_SERVICE} --cluster ${VAR_CLUSTER} | grep -m1 desiredCount | tr -dc [:digit:]", returnStdout: true)
+                int revision = sh(script: "aws ecs describe-task-definition --task-definition ${TASK_NAME} | grep revision | tr -dc [:digit:]", returnStdout: true)
                 sh "aws ecs update-service --cluster ${VAR_CLUSTER} --service ${VAR_SERVICE} --task-definition ${TASK_NAME}:${revision} --desired-count ${desiredCount}"
             }
         }
