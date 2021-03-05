@@ -1,6 +1,8 @@
 {  
     "family": "POCJoiceDevOpsECSQATD1",
     "networkMode": "awsvpc",
+    "memory": "1024",
+    "cpu": "512",
     "containerDefinitions": [
       {            
         "logConfiguration": {
