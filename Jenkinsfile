@@ -33,7 +33,7 @@ timestamps { script {
                 sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp.json"
                 int revision = sh(script: "aws ecs describe-task-definition --task-definition ${TASK_NAME} | grep revision | tr -dc [:digit:]", returnStdout: true)
                 
-                boolean serviceExists = sh(script: "aws ecs describe-services --services POCJoiceDevOpsECSQASRV22 --cluster POCJoiceDevOpsECSQA | (grep -sm1 desiredCount || echo '-1') | tr -dc '0-9-'", returnStdout: true).toInteger() >= 0
+                boolean serviceExists = sh(script: "aws ecs describe-services --services ${VAR_SERVICE} --cluster ${VAR_CLUSTER} | (grep -sm1 desiredCount || echo '-1') | tr -dc '0-9-'", returnStdout: true).toInteger() >= 0
                 
                 if(serviceExists) {
                     sh "aws ecs update-service --cluster ${VAR_CLUSTER} --service ${VAR_SERVICE} --task-definition ${TASK_NAME}:${revision} --desired-count ${DESIRED_COUNT}"
