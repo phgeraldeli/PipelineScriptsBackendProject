@@ -1,14 +1,15 @@
 timestamps { script {
     node('pocjoice') {
         //----------------------------------------
-        String VAR_REGION  = 'us-east-1'
-        String VAR_CRED    = 'aws-devops-test'
-        String VAR_ECR     = '731735707548.dkr.ecr.us-east-1.amazonaws.com'
-        String VAR_IMAGE   = 'pocjoicedevops'
-        String VAR_CLUSTER = 'POCJoiceDevOpsECSQA'
-        String VAR_JSON    = 'taskdef.json'
-        String VAR_SERVICE = 'POCJoiceDevOpsECSQASRV'
-        String TASK_NAME   = 'POCJoiceDevOpsECSQATD1'
+        String VAR_REGION     = 'us-east-1'
+        String VAR_CRED       = 'aws-devops-test'
+        String VAR_ECR        = '731735707548.dkr.ecr.us-east-1.amazonaws.com'
+        String VAR_IMAGE      = 'pocjoicedevops'
+        String VAR_CLUSTER    = 'POCJoiceDevOpsECSQA'
+        String VAR_JSON       = 'taskdef.json'
+        String VAR_SERVICE    = 'POCJoiceDevOpsECSQASRV'
+        String TASK_NAME      = 'POCJoiceDevOpsECSQATD1'
+        int    DESIRED_COUNT  = 2
         //----------------------------------------
         stage('Checkout') {
             checkout scm
@@ -30,9 +31,15 @@ timestamps { script {
                           text: readFile(file: VAR_JSON).replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
                 )
                 sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp.json"
-                int desiredCount = sh(script: "aws ecs describe-services --services ${VAR_SERVICE} --cluster ${VAR_CLUSTER} | grep -m1 desiredCount | tr -dc [:digit:]", returnStdout: true)
                 int revision = sh(script: "aws ecs describe-task-definition --task-definition ${TASK_NAME} | grep revision | tr -dc [:digit:]", returnStdout: true)
-                sh "aws ecs update-service --cluster ${VAR_CLUSTER} --service ${VAR_SERVICE} --task-definition ${TASK_NAME}:${revision} --desired-count ${desiredCount}"
+                
+                boolean serviceExists = sh(script: "aws ecs describe-services --services POCJoiceDevOpsECSQASRV22 --cluster POCJoiceDevOpsECSQA | (grep -sm1 desiredCount || echo '-1') | tr -dc '0-9-'", returnStdout: true).toInteger() >= 0
+                
+                if(serviceExists) {
+                    sh "aws ecs update-service --cluster ${VAR_CLUSTER} --service ${VAR_SERVICE} --task-definition ${TASK_NAME}:${revision} --desired-count ${DESIRED_COUNT}"
+                } else {
+                    sh "aws ecs create-service --service-name ${VAR_SERVICE} --desired-count ${DESIRED_COUNT} --task-definition ${TASK_NAME} --cluster ${VAR_CLUSTER}"
+                }
             }
         }
     }
