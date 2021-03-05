@@ -35,13 +35,10 @@
       {      
         "efsVolumeConfiguration": {        
           "fileSystemId": "fs-9aa85f6c",
-          "authorizationConfig": {
-            "iam": "DISABLED",
-            "accessPointId": null},
           "transitEncryption": "DISABLED",
           "rootDirectory": "/"
         },
-        "name": "testefargatevolume",      
-        "dockerVolumeConfiguration": null}
+        "name": "testefargatevolume"
+      }
     ]
   }
