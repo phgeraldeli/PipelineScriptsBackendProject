@@ -5,8 +5,9 @@ timestamps { script {
         String VAR_CRED    = 'aws-devops-test'
         String VAR_ECR     = '731735707548.dkr.ecr.us-east-1.amazonaws.com'
         String VAR_IMAGE   = 'pocjoicedevops'
-        String VAR_CLUSTER = 'POCJoiceDevOpsEKS'
-        String VAR_YML     = 'deployment.yml'
+        String VAR_CLUSTER = 'POCJoiceDevOpsECSQA'
+        String VAR_JSON    = 'taskdef.json'
+        String VAR_SERVICE = 'POCJoiceDevOpsECSQASRV'
         //----------------------------------------
         stage('Checkout') {
             checkout scm
@@ -23,37 +24,13 @@ timestamps { script {
             sh "sudo docker rmi ${VAR_FULLNAME}:latest ${VAR_FULLNAME}:${BUILD_NUMBER}"
         }
         stage('Deploy QA') {
-            String VAR_APP = 'joiceqa'
-            String VAR_ENV = 'qa'
             withAWS(region: "${VAR_REGION}", credentials: "${VAR_CRED}") {
-                sh "aws eks update-kubeconfig --name ${VAR_CLUSTER}"
-                // FAZER DOWNLOAD DO KUBECTL
-                sh 'curl -o kubectl http://dadhx05.interno:8081/repository/jenkins-dependencies/kubectl_v1.18'
-                sh 'chmod +x ./kubectl'
-
-                sh './kubectl cluster-info'
-                writeFile(file: 'tmp.yml',
-                          text: readFile(file: VAR_YML).replaceAll("@REPLACE_APP@",VAR_APP)
-                                                       .replaceAll("@REPLACE_ENV@",VAR_ENV)
-                                                       .replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
+                writeFile(file: 'tmp.json',
+                          text: readFile(file: VAR_JSON).replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
                 )
-                sh './kubectl apply -f tmp.yml'
-                sh "./kubectl rollout status deployment.apps/${VAR_APP} -n ${VAR_APP}"
-            }
-        }
-        stage('Deploy HML') {
-            String VAR_APP = 'joicehml'
-            String VAR_ENV = 'hml'
-            withAWS(region: VAR_REGION, credentials: VAR_CRED) {
-                sh "aws eks update-kubeconfig --name ${VAR_CLUSTER}"
-                sh './kubectl cluster-info'
-                writeFile(file: 'tmp.yml',
-                          text: readFile(file: VAR_YML).replaceAll("@REPLACE_APP@",VAR_APP)
-                                                       .replaceAll("@REPLACE_ENV@",VAR_ENV)
-                                                       .replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
-                )
-                sh './kubectl apply -f tmp.yml'
-                sh "./kubectl rollout status deployment.apps/${VAR_APP} -n ${VAR_APP}"
+                sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp.json"
+                // int desiredCount = sh("aws ecs describe-services --services ${VAR_SERVICE} --cluster ${VAR_CLUSTER} | grep -m1 desiredCount | tr -dc [:digit:]", returnStdout: true)
+                // sh "aws ecs update-service --cluster ${CLUSTER} --region ${REGION} --service ${SERVICE_NAME} --task-definition ${FAMILY}:${REVISION} --desired-count ${}"
             }
         }
     }

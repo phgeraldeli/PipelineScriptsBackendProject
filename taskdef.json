@@ -1,0 +1,47 @@
+{  
+    "family": "POCJoiceDevOpsECSQATD1",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+      {            
+        "logConfiguration": {
+          "logDriver": "awslogs",        
+          "options": {
+            "awslogs-group": "/ecs/POCJoiceDevOpsECSQATD1",
+            "awslogs-region": "us-east-1",
+            "awslogs-stream-prefix": "ecs"
+          }
+        },      
+        "portMappings": [
+          {
+            "hostPort": 3000,
+            "protocol": "tcp",
+            "containerPort": 3000
+          }
+        ],                             
+        "mountPoints": [
+          {          
+            "containerPath": "/tmp/teste",
+            "sourceVolume": "testefargatevolume"
+          }
+        ],                              
+        "volumesFrom": [],      
+        "image": "@REPLACE_IMG@",                                    
+        "essential": true,                                               
+        "name": "POCJoiceDevOpsECSQACT1"
+      }
+    ],
+   
+    "volumes": [
+      {      
+        "efsVolumeConfiguration": {        
+          "fileSystemId": "fs-9aa85f6c",
+          "authorizationConfig": {
+            "iam": "DISABLED",
+            "accessPointId": null},
+          "transitEncryption": "DISABLED",
+          "rootDirectory": "/"
+        },
+        "name": "testefargatevolume",      
+        "dockerVolumeConfiguration": null}
+    ]
+  }
