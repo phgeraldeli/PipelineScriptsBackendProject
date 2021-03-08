@@ -2,7 +2,7 @@
     "family": "@REPLACE_FAMILY@",
     "networkMode": "@REPLACE_NETWORK_MODE@",
     "memory": "512",
-    "cpu": "500",
+    "cpu": "256",
     "executionRoleArn": "arn:aws:iam::731735707548:role/ecsTaskExecutionRole",
     "requiresCompatibilities": [		
         "@REPLACE_COMPATIBILITY@"
