@@ -39,6 +39,7 @@ timestamps { script {
                                                         .replaceAll("@REPLACE_NETWORK_MODE@", "awsvpc")
                                                         .replaceAll("@REPLACE_COMPATIBILITY@", "FARGATE")
                                                         .replaceAll("@REPLACE_LOG_GROUP@", "/ecs/POCJoiceDevOpsECSQATD1")
+                                                        .replaceAll("@REPLACE_HOST_PORT@", 3000)
                 )
                 sh 'cat tmp_qa.json'
                 sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp_qa.json"
@@ -62,6 +63,7 @@ timestamps { script {
                                                         .replaceAll("@REPLACE_NETWORK_MODE@", "bridge")
                                                         .replaceAll("@REPLACE_COMPATIBILITY@", "EC2")
                                                         .replaceAll("@REPLACE_LOG_GROUP@", "/ecs/POCJoiceDevOpsECSQATD1")
+                                                        .replaceAll("@REPLACE_HOST_PORT@", 0)
                 )
 
                 sh 'cat tmp_hml.json'
