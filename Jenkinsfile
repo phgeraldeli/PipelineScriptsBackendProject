@@ -38,6 +38,7 @@ timestamps { script {
                                                         .replaceAll("@REPLACE_CONTAINER@", "${CONTAINER_QA}")
                                                         .replaceAll("@REPLACE_NETWORK_MODE@", "awsvpc")
                                                         .replaceAll("@REPLACE_COMPATIBILITY@", "FARGATE")
+                                                        .replaceAll("@REPLACE_LOG_GROUP@", "/ecs/POCJoiceDevOpsECSQATD1")
                 )
                 sh 'cat tmp_qa.json'
                 sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp_qa.json"
@@ -60,6 +61,7 @@ timestamps { script {
                                                         .replaceAll("@REPLACE_CONTAINER@", "${CONTAINER_HML}")
                                                         .replaceAll("@REPLACE_NETWORK_MODE@", "bridge")
                                                         .replaceAll("@REPLACE_COMPATIBILITY@", "EC2")
+                                                        .replaceAll("@REPLACE_LOG_GROUP@", "/ecs/POCJoiceDevOpsECSQATD1")
                 )
 
                 sh 'cat tmp_hml.json'
