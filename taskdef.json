@@ -19,7 +19,7 @@
         },      
         "portMappings": [
           {
-            "hostPort": "@REPLACE_HOST_PORT@",
+            "hostPort": @REPLACE_HOST_PORT@,
             "protocol": "tcp",
             "containerPort": 3000
           }
