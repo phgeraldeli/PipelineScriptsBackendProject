@@ -36,6 +36,7 @@ timestamps { script {
                           text: readFile(file: VAR_JSON).replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
                                                         .replaceAll("@REPLACE_FAMILY@","${TASK_NAME_QA}")
                                                         .replaceAll("@REPLACE_CONTAINER@", "${CONTAINER_QA}")
+                                                        .replaceAll("@REPLACE_NETWORK_MODE@", "awsvpc")
                 )
                 sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp_qa.json"
                 int revision = sh(script: "aws ecs describe-task-definition --task-definition ${TASK_NAME_QA} | grep revision | tr -dc [:digit:]", returnStdout: true)
@@ -55,6 +56,7 @@ timestamps { script {
                           text: readFile(file: VAR_JSON).replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
                                                         .replaceAll("@REPLACE_FAMILY@","${TASK_NAME_HML}")
                                                         .replaceAll("@REPLACE_CONTAINER@", "${CONTAINER_HML}")
+                                                        .replaceAll("@REPLACE_NETWORK_MODE@", "bridge")
                 )
 
                 sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp_hml.json"
