@@ -39,7 +39,7 @@ timestamps { script {
                                                         .replaceAll("@REPLACE_NETWORK_MODE@", "awsvpc")
                                                         .replaceAll("@REPLACE_COMPATIBILITY@", "FARGATE")
                                                         .replaceAll("@REPLACE_LOG_GROUP@", "/ecs/POCJoiceDevOpsECSQATD1")
-                                                        .replaceAll("@REPLACE_HOST_PORT@", 3000)
+                                                        .replaceAll("@REPLACE_HOST_PORT@", "3000")
                 )
                 sh 'cat tmp_qa.json'
                 sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp_qa.json"
@@ -48,7 +48,7 @@ timestamps { script {
                 boolean serviceExists = sh(script: "aws ecs describe-services --services ${VAR_SERVICE_QA} --cluster ${VAR_CLUSTER_QA} | (grep -sm1 desiredCount || echo '-1') | tr -dc '0-9-'", returnStdout: true).toInteger() >= 0
                 
                 if(serviceExists) {
-                    sh "aws ecs update-service --cluster ${VAR_CLUSTER_QA} --service ${VAR_SERVICE_QA} --task-definition ${TASK_NAME_QA}:${revision} --desired-count ${DESIRED_COUNT}"
+                    sh "aws ecs update-service --cluster ${VAR_CLUSTER_QA} --service ${VAR_SERVICE_QA} --task-definition ${TASK_NAME_QA}:${revision} --desired-count ${DESIRED_COUNT} --force-new-deployment"
                 } else {
                     sh "aws ecs create-service --service-name ${VAR_SERVICE_QA} --desired-count ${DESIRED_COUNT} --task-definition ${TASK_NAME_QA} --cluster ${VAR_CLUSTER_QA}"
                 }
@@ -63,7 +63,7 @@ timestamps { script {
                                                         .replaceAll("@REPLACE_NETWORK_MODE@", "bridge")
                                                         .replaceAll("@REPLACE_COMPATIBILITY@", "EC2")
                                                         .replaceAll("@REPLACE_LOG_GROUP@", "/ecs/POCJoiceDevOpsECSQATD1")
-                                                        .replaceAll("@REPLACE_HOST_PORT@", 0)
+                                                        .replaceAll("@REPLACE_HOST_PORT@", "0")
                 )
 
                 sh 'cat tmp_hml.json'
@@ -72,7 +72,7 @@ timestamps { script {
                 boolean serviceExists = sh(script: "aws ecs describe-services --services ${VAR_SERVICE_HML} --cluster ${VAR_CLUSTER_HML} | (grep -sm1 desiredCount || echo '-1') | tr -dc '0-9-'", returnStdout: true).toInteger() >= 0
                 
                 if(serviceExists) {
-                    sh "aws ecs update-service --cluster ${VAR_CLUSTER_HML} --service ${VAR_SERVICE_HML} --task-definition ${TASK_NAME_HML}:${revision} --desired-count ${DESIRED_COUNT}"
+                    sh "aws ecs update-service --cluster ${VAR_CLUSTER_HML} --service ${VAR_SERVICE_HML} --task-definition ${TASK_NAME_HML}:${revision} --desired-count ${DESIRED_COUNT} --force-new-deployment"
                 } else {
                     sh "aws ecs create-service --service-name ${VAR_SERVICE_HML} --desired-count ${DESIRED_COUNT} --task-definition ${TASK_NAME_HML} --cluster ${VAR_CLUSTER_HML}"
                 }
