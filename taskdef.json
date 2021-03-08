@@ -5,7 +5,8 @@
     "cpu": "512",
     "executionRoleArn": "arn:aws:iam::731735707548:role/ecsTaskExecutionRole",
     "requiresCompatibilities": [		
-        "FARGATE"	
+        "FARGATE",
+        "EC2"	
     ],
     "containerDefinitions": [
       {            
