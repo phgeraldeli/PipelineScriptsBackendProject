@@ -1,5 +1,5 @@
 {  
-    "family": "POCJoiceDevOpsECSQATD1",
+    "family": "@REPLACE_FAMILY@",
     "networkMode": "awsvpc",
     "memory": "1024",
     "cpu": "512",
@@ -12,7 +12,7 @@
         "logConfiguration": {
           "logDriver": "awslogs",        
           "options": {
-            "awslogs-group": "/ecs/POCJoiceDevOpsECSQATD1",
+            "awslogs-group": "/ecs/@REPLACE_FAMILY@",
             "awslogs-region": "us-east-1",
             "awslogs-stream-prefix": "ecs"
           }
@@ -33,7 +33,7 @@
         "volumesFrom": [],      
         "image": "@REPLACE_IMG@",                                    
         "essential": true,                                               
-        "name": "POCJoiceDevOpsECSQACT1"
+        "name": "@REPLACE_CONTAINER@"
       }
     ],
    

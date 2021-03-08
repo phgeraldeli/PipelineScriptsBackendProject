@@ -12,6 +12,8 @@ timestamps { script {
         String VAR_SERVICE_HML = 'POCJoiceDevOpsECSSVR1'
         String TASK_NAME_QA    = 'POCJoiceDevOpsECSQATD1'
         String TASK_NAME_HML   = 'POCJoiceDevOpsECSTD1'
+        String CONTAINER_QA    = 'POCJoiceDevOpsECSQACT1'
+        String CONTAINER_HML   = 'pocjoicedevopshml'
         int    DESIRED_COUNT   = 2
         //----------------------------------------
         stage('Checkout') {
@@ -30,10 +32,12 @@ timestamps { script {
         }
         stage('Deploy QA') {
             withAWS(region: "${VAR_REGION}", credentials: "${VAR_CRED}") {
-                writeFile(file: 'tmp.json',
+                writeFile(file: 'tmp_qa.json',
                           text: readFile(file: VAR_JSON).replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
+                                                        .replaceAll("@REPLACE_FAMILY@","${TASK_NAME_QA}")
+                                                        .replaceAll("@REPLACE_CONTAINER@", "${CONTAINER_QA}")
                 )
-                sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp.json"
+                sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp_qa.json"
                 int revision = sh(script: "aws ecs describe-task-definition --task-definition ${TASK_NAME_QA} | grep revision | tr -dc [:digit:]", returnStdout: true)
                 
                 boolean serviceExists = sh(script: "aws ecs describe-services --services ${VAR_SERVICE_QA} --cluster ${VAR_CLUSTER_QA} | (grep -sm1 desiredCount || echo '-1') | tr -dc '0-9-'", returnStdout: true).toInteger() >= 0
@@ -47,11 +51,13 @@ timestamps { script {
         }
         stage('Deploy HML') {
             withAWS(region: "${VAR_REGION}", credentials: "${VAR_CRED}") {
-                writeFile(file: 'tmp.json',
+                writeFile(file: 'tmp_hml.json',
                           text: readFile(file: VAR_JSON).replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
+                                                        .replaceAll("@REPLACE_FAMILY@","${TASK_NAME_HML}")
+                                                        .replaceAll("@REPLACE_CONTAINER@", "${CONTAINER_HML}")
                 )
-                
-                sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp.json"
+
+                sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp_hml.json"
                 int revision = sh(script: "aws ecs describe-task-definition --task-definition ${TASK_NAME_HML} | grep revision | tr -dc [:digit:]", returnStdout: true)
                 boolean serviceExists = sh(script: "aws ecs describe-services --services ${VAR_SERVICE_HML} --cluster ${VAR_CLUSTER_HML} | (grep -sm1 desiredCount || echo '-1') | tr -dc '0-9-'", returnStdout: true).toInteger() >= 0
                 
