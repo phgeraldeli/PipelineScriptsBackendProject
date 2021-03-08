@@ -3,7 +3,6 @@
     "networkMode": "awsvpc",
     "memory": "1024",
     "cpu": "512",
-    "executionRoleArn": "arn:aws:iam::731735707548:role/ecsTaskExecutionRole",
     "requiresCompatibilities": [		
         "FARGATE",
         "EC2"	
