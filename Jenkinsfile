@@ -10,7 +10,8 @@ timestamps { script {
         String VAR_JSON        = 'taskdef.json'
         String VAR_SERVICE_QA  = 'POCJoiceDevOpsECSQASRV'
         String VAR_SERVICE_HML = 'POCJoiceDevOpsECSSVR1'
-        String TASK_NAME       = 'POCJoiceDevOpsECSQATD1'
+        String TASK_NAME_QA    = 'POCJoiceDevOpsECSQATD1'
+        String TASK_NAME_HML   = 'POCJoiceDevOpsECSTD1'
         int    DESIRED_COUNT   = 2
         //----------------------------------------
         stage('Checkout') {
@@ -33,14 +34,14 @@ timestamps { script {
                           text: readFile(file: VAR_JSON).replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
                 )
                 sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp.json"
-                int revision = sh(script: "aws ecs describe-task-definition --task-definition ${TASK_NAME} | grep revision | tr -dc [:digit:]", returnStdout: true)
+                int revision = sh(script: "aws ecs describe-task-definition --task-definition ${TASK_NAME_QA} | grep revision | tr -dc [:digit:]", returnStdout: true)
                 
                 boolean serviceExists = sh(script: "aws ecs describe-services --services ${VAR_SERVICE_QA} --cluster ${VAR_CLUSTER_QA} | (grep -sm1 desiredCount || echo '-1') | tr -dc '0-9-'", returnStdout: true).toInteger() >= 0
                 
                 if(serviceExists) {
-                    sh "aws ecs update-service --cluster ${VAR_CLUSTER_QA} --service ${VAR_SERVICE_QA} --task-definition ${TASK_NAME}:${revision} --desired-count ${DESIRED_COUNT}"
+                    sh "aws ecs update-service --cluster ${VAR_CLUSTER_QA} --service ${VAR_SERVICE_QA} --task-definition ${TASK_NAME_QA}:${revision} --desired-count ${DESIRED_COUNT}"
                 } else {
-                    sh "aws ecs create-service --service-name ${VAR_SERVICE_QA} --desired-count ${DESIRED_COUNT} --task-definition ${TASK_NAME} --cluster ${VAR_CLUSTER_QA}"
+                    sh "aws ecs create-service --service-name ${VAR_SERVICE_QA} --desired-count ${DESIRED_COUNT} --task-definition ${TASK_NAME_QA} --cluster ${VAR_CLUSTER_QA}"
                 }
             }
         }
@@ -49,14 +50,15 @@ timestamps { script {
                 writeFile(file: 'tmp.json',
                           text: readFile(file: VAR_JSON).replaceAll("@REPLACE_IMG@","${VAR_FULLNAME}:${BUILD_NUMBER}")
                 )
-
-                int revision = sh(script: "aws ecs describe-task-definition --task-definition ${TASK_NAME} | grep revision | tr -dc [:digit:]", returnStdout: true)
+                
+                sh "aws ecs register-task-definition --cli-input-json file://${WORKSPACE}/tmp.json"
+                int revision = sh(script: "aws ecs describe-task-definition --task-definition ${TASK_NAME_HML} | grep revision | tr -dc [:digit:]", returnStdout: true)
                 boolean serviceExists = sh(script: "aws ecs describe-services --services ${VAR_SERVICE_HML} --cluster ${VAR_CLUSTER_HML} | (grep -sm1 desiredCount || echo '-1') | tr -dc '0-9-'", returnStdout: true).toInteger() >= 0
                 
                 if(serviceExists) {
-                    sh "aws ecs update-service --cluster ${VAR_CLUSTER_HML} --service ${VAR_SERVICE_HML} --task-definition ${TASK_NAME}:${revision} --desired-count ${DESIRED_COUNT}"
+                    sh "aws ecs update-service --cluster ${VAR_CLUSTER_HML} --service ${VAR_SERVICE_HML} --task-definition ${TASK_NAME_HML}:${revision} --desired-count ${DESIRED_COUNT}"
                 } else {
-                    sh "aws ecs create-service --service-name ${VAR_SERVICE_HML} --desired-count ${DESIRED_COUNT} --task-definition ${TASK_NAME} --cluster ${VAR_CLUSTER_HML}"
+                    sh "aws ecs create-service --service-name ${VAR_SERVICE_HML} --desired-count ${DESIRED_COUNT} --task-definition ${TASK_NAME_HML} --cluster ${VAR_CLUSTER_HML}"
                 }
             }
         }
