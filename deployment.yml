@@ -85,3 +85,25 @@ spec:
         periodSeconds: 10
         successThreshold: 1
         failureThreshold: 3
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: "@REPLACE_APP@"
+  labels:
+    app: "@REPLACE_APP@"
+    env: "@REPLACE_ENV@"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: "@REPLACE_APP@"
+  minReplicas: 1
+  maxReplicas: 7
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target: 
+        type: Utilization
+        averageUtilization: 50
