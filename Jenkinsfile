@@ -5,7 +5,7 @@ timestamps { script {
         String VAR_CRED    = 'aws-devops-test'
         String VAR_ECR     = '731735707548.dkr.ecr.us-east-1.amazonaws.com'
         String VAR_IMAGE   = 'pocjoicedevops'
-        String VAR_CLUSTER = 'POCJoiceDevOpsEKS'
+        String VAR_CLUSTER = 'POCJoiceEKS'
         String VAR_YML     = 'deployment.yml'
         //----------------------------------------
         stage('Checkout') {

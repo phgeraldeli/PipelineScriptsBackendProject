@@ -23,7 +23,7 @@ metadata:
   namespace: "@REPLACE_APP@"
 spec:
   rules:
-    - host: "pocjoicedevops@REPLACE_ENV@.oi.com.br"
+    - host: "pocjoice@REPLACE_ENV@.oi.com.br"
       http:
         paths:
           - backend:
@@ -62,7 +62,7 @@ spec:
           memory: 1Gi
         requests:
           cpu: 250m
-          memory: 256Mi
+          memory: 512Mi
       ports:
        - containerPort: 3000
       livenessProbe:
